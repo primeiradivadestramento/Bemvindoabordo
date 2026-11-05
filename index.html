@@ -360,6 +360,11 @@ select.input{appearance:none;background-image:linear-gradient(45deg,transparent 
 .tn-card{position:relative;display:flex;flex-direction:column;gap:10px;padding:14px 14px 14px 18px;border-radius:14px;background:rgba(0,0,0,.22);border:1px solid var(--glass-b);overflow:hidden}
 .tn-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--c)}
 .tn-card-h{display:flex;align-items:center;gap:8px}.tn-card-h .iconbtn{margin-left:auto}
+.tn-sw{display:inline-block;flex:none;width:14px;height:14px;border-radius:50%;border:1px solid rgba(255,255,255,.35);vertical-align:-2px;margin-right:6px}.tn-sw.lg{width:30px;height:30px;margin:0}
+.tn-cores button{display:inline-flex;align-items:center}
+.tn-nome{display:flex;flex-direction:column;min-width:0}.tn-nome b{font-family:var(--f-display);font-size:18px;overflow-wrap:anywhere}.tn-nome span{font-size:12.5px;color:var(--muted)}
+.tn-uso{display:flex;flex-direction:column;gap:2px}.tn-uso small{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:700}.tn-uso span{font-size:15px;line-height:1.45}
+.tn-local span{color:var(--accent-ink);font-weight:600}
 .tn-pair{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:10px;align-items:center}
 .tn-pair>div{display:flex;flex-direction:column;gap:2px;min-width:0}.tn-pair small,.tn-kv small,.tn-def small{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:700}
 .tn-pair b{font-size:20px;color:var(--accent-ink);overflow-wrap:anywhere}.tn-pair span{font-size:13.5px;color:var(--muted)}
@@ -1055,8 +1060,8 @@ function gIndex(){
   E.push({tipo:"Lazer", t:"Aliado", sub:"O ludo da Marinha, em duplas", txt:"aliado jogo ludo dados dupla tabuleiro lona paiol caveira pitoco sena ás morto peru sangrando lazer passatempo fluminense flamengo vasco botafogo", act:"marOpen", arg:"aliado"});
   E.push({tipo:"Marinharia", t:"Que peça é essa?", sub:"Jogo de nomes de equipamentos", txt:"jogo quiz treinar nomes equipamento peça figura moitão catarina patesca charneira cadernal trolley talha teque manilha gato sapatilho tornel ferro âncora poleame marinheiro cabo cabo de esquadra sargento mestre", act:"marOpen", arg:"jogo"});
   E.push({tipo:"Marinharia", t:"Apostilas", sub:"Arte Naval, Mestrança, Fainas Marinheiras Especiais, Manobras de Peso, ENGENALMARINST 60-01D", txt:"apostila apostilas arte naval mestrança fainas marinheiras especiais manobras de peso ciaa c-ap mr livro pdf ler pesquisar engenalmarinst 60-01d publicação pintura", act:"marOpen", arg:"apostilas"});
-  E.push({tipo:"Marinharia", t:"Tintas e pintura", sub:"Localizador, tipos, compatibilidade, mistura", txt:"tinta tintas pintura pintar alquídica alquidica esmalte sintético epóxi epoxi poliuretano pu catalisador componente endurecedor agente de cura isocianato neb numeração proporção mistura pot life vida útil diluente thinner solvente pigmento resina verniz primer fundo acabamento enrugar bolha estourar descascar calcinação compatibilidade teste do solvente", act:"marOpen", arg:"tintas"});
-  ((S.content.tintas && S.content.tintas.data.itens) || []).forEach(t => E.push({tipo:"Tintas", t:(t.num ? t.num + " · " : "") + (t.nome || "Tinta"), sub:(TIPOS_TINTA[t.tipo] || TIPOS_TINTA.out).n + (t.comp ? " · componente " + t.comp : ""), txt:[t.num, t.nome, t.comp, t.compNome, t.cor, t.uso, t.obs].join(" "), act:"tnAbrir", arg:t.num || t.nome || ""}));
+  E.push({tipo:"Marinharia", t:"Tintas e pintura", sub:"Tintas do paiol pela cor, tipos, compatibilidade, mistura", txt:"tinta tintas paiol cor cores pintura pintar alquídica alquidica esmalte sintético epóxi epoxi poliuretano pu catalisador componente endurecedor agente de cura isocianato neb numeração proporção mistura pot life vida útil diluente thinner solvente pigmento resina verniz primer fundo acabamento enrugar bolha estourar descascar calcinação compatibilidade teste do solvente", act:"marOpen", arg:"tintas"});
+  ((S.content.tintas && S.content.tintas.data.itens) || []).forEach(t => E.push({tipo:"Tintas", t:(t.num ? t.num + " · " : "") + (t.nome || "Tinta"), sub:[TIPOS_TINTA[t.tipo] ? TIPOS_TINTA[t.tipo].n : "", t.uso].filter(Boolean).join(" · "), txt:[t.num, t.nome, t.comp, t.compNome, t.cor, tnFam(t), t.grupo, t.uso, t.local, t.obs].join(" "), act:"tnAbrir", arg:t.num || t.nome || ""}));
   E.push({tipo:"Marinharia", t:"Esquemas de pintura", sub:"Ordem das tintas por local (ENGENALMARINST 60-01D)", txt:"esquema esquemas de pintura engenalmarinst 60-01d ordem das tintas demão demãos primer acabamento costado superestrutura linha d'água obras vivas convoo convés de voo convés escada plataforma de pouso tanque aguada paiol amarras ferro munição console painel indicativo calado", act:"marOpen", arg:"esquemas"});
   { const D = esData(); if (D) { D.grupos.forEach(g => E.push({tipo:"Pintura", t:"Esquema de pintura: " + g.nome, sub:"Apêndices " + g.aps.join(", ") + " da ENGENALMARINST 60-01D", txt:g.nome + " " + g.chave + " esquema pintura", act:"esAbrir", arg:g.id})); (D.bordo || []).forEach(r => E.push({tipo:"Pintura", t:"Esquema de pintura: " + r.area, sub:"Esquema de bordo", txt:r.area + " " + (r.esquema || "") + " esquema pintura", act:"esAbrir", arg:"bordo"})); } }
   E.push({tipo:"Marinharia", t:"Cintas de elevação", sub:"Cores, etiqueta, fator 7:1, modos, inspeção", txt:"cinta cintas elevação içamento içar lingada cor cores lilás verde amarela cinza vermelha marrom azul laranja etiqueta cmt wll carga máxima trabalho fator segurança 7 enforcada cesto ângulo pernas inspeção descarte nbr 15637 en 1492 nr-11 poliéster tubular plana", act:"marOpen", arg:"cintas"});
@@ -1504,7 +1509,7 @@ const marTiles = () => `<button class="tile" data-act="marOpen" data-arg="aliado
   <button class="tile" data-act="prAbrir" data-arg="postos"><div class="tile-i">${ic("whistle")}</div><b>Ordem de precedência</b><div class="sub">Postos do mais antigo ao mais moderno, o toque de apito de cada um, quantos boys e as autoridades civis.</div></button>
   <button class="tile" data-act="marOpen" data-arg="jogo"><div class="tile-i">${ic("game")}</div><b>Que peça é essa?</b><div class="sub">Jogo: veja a figura e diga o nome. Níveis de Marinheiro a Mestre.</div></button>
   <button class="tile" data-act="marOpen" data-arg="apostilas"><div class="tile-i">${ic("book")}</div><b>Apostilas</b><div class="sub">Arte Naval, Mestrança, Fainas Marinheiras Especiais, Manobras de Peso e ENGENALMARINST 60-01D, com pesquisa.</div></button>
-  <button class="tile" data-act="marOpen" data-arg="tintas"><div class="tile-i">${ic("roller")}</div><b>Tintas e pintura</b><div class="sub">Localizador de tinta e catalisador, alquídica, epóxi e PU, o que pode ir sobre o quê e como acertar a mistura.</div></button>
+  <button class="tile" data-act="marOpen" data-arg="tintas"><div class="tile-i">${ic("roller")}</div><b>Tintas e pintura</b><div class="sub">Tintas do paiol pela cor (tipo e para que serve), alquídica, epóxi e PU, o que pode ir sobre o quê e como acertar a mistura.</div></button>
   <button class="tile" data-act="marOpen" data-arg="esquemas"><div class="tile-i">${ic("layers")}</div><b>Esquemas de pintura</b><div class="sub">Costado, convoo, convés, tanques, paióis: o preparo e a ordem das tintas, pela ENGENALMARINST 60-01D.</div></button>
   <button class="tile" data-act="marOpen" data-arg="cintas"><div class="tile-i">${ic("sling")}</div><b>Cintas de elevação</b><div class="sub">Código de cores, etiqueta, fator de segurança, modos de amarração e quando retirar de uso.</div></button>
   <button class="tile" data-act="tool" data-arg="espias"><div class="tile-i">${ic("rope")}</div><b>Calculadora de espias</b><div class="sub">Bitola, diâmetro e carga de ruptura dos cabos por material.</div></button>`;
@@ -1908,46 +1913,68 @@ function viewTintas(){
 
 /* --- localizador --- */
 function tnLocalizador(){
-  const L = tintasData().itens || [], q = norm(TN.q).trim();
-  const hits = q ? L.filter(t => norm([t.num, t.nome, t.comp, t.compNome, t.cor, TIPOS_TINTA[t.tipo] ? TIPOS_TINTA[t.tipo].n : "", t.uso].join(" ")).includes(q)) : [];
-  return `<section class="card col tn-loc" id="tn-loc"><div class="row" style="flex-wrap:wrap"><div class="tile-i">${ic("search")}</div><div style="flex:1;min-width:180px"><b class="tn-h">Localizador de tintas</b><div class="sub">Digite a numeração (NEB) da tinta ou do componente e veja o par certo.</div></div>${isAdmin() ? `<button class="btn sm" data-act="tnNova">${ic("plus")}Adicionar tinta</button>` : ""}</div>
-    <div class="search">${ic("search")}<input id="tn-q" class="input" type="search" inputmode="search" placeholder="Numeração, nome ou cor" autocomplete="off" value="${esc(TN.q)}" aria-label="Procurar tinta"></div>
-    <div id="tn-res" class="tn-res">${tnRes(L, q, hits)}</div></section>`;
+  const L = tintasData().itens || [];
+  const fams = TN_CORES.filter(([n]) => L.some(t => tnFam(t) === n));
+  return `<section class="card col tn-loc" id="tn-loc"><div class="row" style="flex-wrap:wrap"><div class="tile-i">${ic("search")}</div><div style="flex:1;min-width:180px"><b class="tn-h">Tintas do paiol</b><div class="sub">Escreva a cor (ou o PI da lata) e veja os tipos de tinta, para que serve cada uma e onde achar.</div></div>${isAdmin() ? `<button class="btn sm" data-act="tnNova">${ic("plus")}Adicionar tinta</button>` : ""}</div>
+    <div class="search">${ic("search")}<input id="tn-q" class="input" type="search" inputmode="search" placeholder="Cor da tinta. Ex.: cinza, amarelo, preto fosco" autocomplete="off" value="${esc(TN.q)}" aria-label="Procurar tinta pela cor"></div>
+    ${fams.length ? `<div class="es-chips tn-cores">${fams.map(([n, c]) => `<button type="button" data-act="tnCor" data-arg="${esc(n)}" aria-pressed="${norm(TN.q).trim() === norm(n)}"><i class="tn-sw" style="background:${c}"></i>${esc(n)}</button>`).join("")}</div>` : ""}
+    <div id="tn-res" class="tn-res">${tnRes(L, TN.q)}</div></section>`;
 }
-function tnRes(L, q, hits){
-  if (!L.length) return `<div class="note">${ic("info")}<span><b>A tabela de tintas de bordo ainda não foi carregada.</b> Assim que ela entrar, é só digitar a numeração da lata para ver o componente que bate com ela, a proporção da mistura e onde a tinta é usada.${isAdmin() ? " Você pode adicionar uma por uma em <b>Adicionar tinta</b> ou mandar a tabela inteira." : ""}</span></div>`;
-  if (!q) return `<div class="sub">${L.length} ${L.length === 1 ? "tinta cadastrada" : "tintas cadastradas"}. Digite para procurar.</div>`;
-  if (!hits.length) return `<div class="note warn">${ic("alert")}<span>Nenhuma tinta com “${esc(TN.q)}”. Confira a numeração na etiqueta da lata. Na dúvida, não misture: pergunte ao encarregado.</span></div>`;
-  return hits.slice(0, 30).map(tnCard).join("");
+/* Cor da lata: família (para os botões e a bolinha) tirada do campo cor ou do nome. */
+const TN_CORES = [["Branco", "#f1f1ee"], ["Preto", "#151515"], ["Cinza", "#8d949b"], ["Azul", "#2E6FD6"], ["Vermelho", "#c0302a"], ["Laranja", "#F07A22"], ["Amarelo", "#F2C230"], ["Verde", "#2f8a4a"], ["Marrom", "#6b4226"], ["Púrpura", "#7b3fa0"], ["Alumínio", "#c3c7cc"], ["Solvente", "linear-gradient(135deg,#dfe7ee,#9fb3c4)"]];
+const TN_FAM = [["solvente", "Solvente"], ["diluente", "Solvente"], ["zarcao", "Vermelho"], ["aluminio", "Alumínio"], ["oxibar", "Alumínio"], ["branc", "Branco"], ["pret", "Preto"], ["cinz", "Cinza"], ["azul", "Azul"], ["vermelh", "Vermelho"], ["laranj", "Laranja"], ["amarel", "Amarelo"], ["verde", "Verde"], ["marrom", "Marrom"], ["purpur", "Púrpura"], ["roxo", "Púrpura"]];
+function tnFam(t){ const n = norm((t.cor || "") + " " + (t.nome || "")), m = TN_FAM.find(([k]) => n.includes(k)); return m ? m[1] : ""; }
+const tnSwatch = t => { const f = TN_CORES.find(([n]) => n === tnFam(t)); return f ? f[1] : "transparent"; };
+/* Cada palavra digitada precisa aparecer na tinta; aceita feminino e plural (amarela, cinzas, pretas). */
+function tnBusca(L, q){
+  const ws = norm(q).replace(/[^a-z0-9,.\- ]/g, " ").split(/\s+/).filter(Boolean).map(w => w.length > 4 ? w.replace(/s$/, "").replace(/[aoe]$/, "") : w.replace(/s$/, ""));
+  if (!ws.length) return [];
+  const fo = norm(q).trim(), ord = t => (norm(tnFam(t)).startsWith(fo.slice(0, 4)) ? 0 : 1);
+  return L.filter(t => { const s = norm([t.num, t.nome, t.cor, tnFam(t), t.comp, t.compNome, TIPOS_TINTA[t.tipo] ? TIPOS_TINTA[t.tipo].n : "", t.grupo, t.uso, t.local, t.obs].join(" ")), sn = s.replace(/[^a-z0-9]/g, "");
+    return ws.every(w => s.includes(w) || (/\d/.test(w) && sn.includes(w.replace(/[^a-z0-9]/g, "")))); })
+    .sort((a, b) => ord(a) - ord(b) || TN_CORES.findIndex(c => c[0] === tnFam(a)) - TN_CORES.findIndex(c => c[0] === tnFam(b)) || String(a.nome).localeCompare(String(b.nome)));
+}
+function tnRes(L, qq){
+  const q = norm(qq).trim();
+  if (!L.length) return `<div class="note">${ic("info")}<span><b>A tabela de tintas de bordo ainda não foi carregada.</b> Abra o app com internet uma vez e ela fica guardada no aparelho.${isAdmin() ? " Você pode adicionar uma por uma em <b>Adicionar tinta</b>." : ""}</span></div>`;
+  if (!q) return `<div class="sub">${L.length} ${L.length === 1 ? "tinta cadastrada" : "tintas cadastradas"}. Toque numa cor ou escreva para procurar.</div>`;
+  const hits = tnBusca(L, qq);
+  if (!hits.length) return `<div class="note warn">${ic("alert")}<span>Nenhuma tinta com “${esc(qq)}”. Tente só a cor (cinza, preto, amarelo…) ou o PI da etiqueta da lata. Na dúvida, não use: pergunte ao encarregado.</span></div>`;
+  return `<div class="sub">${hits.length} ${hits.length === 1 ? "tinta" : "tintas"}</div>` + hits.slice(0, 60).map(tnCard).join("");
 }
 function tnCard(t){
-  const T = TIPOS_TINTA[t.tipo] || TIPOS_TINTA.out, bi = t.tipo === "epo" || t.tipo === "pu" || t.comp;
-  return `<div class="tn-card" style="--c:${T.c}"><div class="tn-card-h"><span class="pill" style="color:${T.c};border-color:${T.c}55">${esc(T.n)}</span>${isAdmin() ? `<button class="iconbtn sm" data-act="tnEdit" data-arg="${esc(t.id)}" aria-label="Editar">${ic("edit")}</button>` : ""}</div>
-    <div class="tn-pair"><div><small>Tinta (base)</small><b class="num">${esc(t.num || "—")}</b><span>${esc(t.nome || "")}${t.cor ? " · " + esc(t.cor) : ""}</span></div>
-    ${bi ? `<div class="tn-plus">+</div><div><small>Componente</small><b class="num">${esc(t.comp || "—")}</b><span>${esc(t.compNome || "")}</span></div>` : `<div class="tn-one"><small>Componente</small><span>Não leva: tinta de 1 componente.</span></div>`}</div>
-    <div class="tn-kv">${t.prop ? `<span><small>Proporção</small><b class="num">${esc(t.prop)}</b></span>` : ""}${t.embA ? `<span><small>Embalagens</small><b class="num">${esc(t.embA)} L${t.embB ? " + " + esc(t.embB) + " L" : ""}</b></span>` : ""}${t.pot ? `<span><small>Vida da mistura</small><b>${esc(t.pot)}</b></span>` : ""}${t.dil ? `<span><small>Diluente</small><b>${esc(t.dil)}</b></span>` : ""}</div>
-    ${t.uso ? `<div class="sub"><b style="color:var(--ink)">Onde usar:</b> ${esc(t.uso)}</div>` : ""}${t.obs ? `<div class="sub">${esc(t.obs)}</div>` : ""}
+  const T = TIPOS_TINTA[t.tipo], c = T ? T.c : "#9AAEC2", bi = !!t.comp;
+  return `<div class="tn-card" style="--c:${c}"><div class="tn-card-h"><span class="tn-sw lg" style="background:${tnSwatch(t)}"></span><div class="tn-nome"><b>${esc(t.nome || t.cor || "Tinta")}</b>${t.num ? `<span class="num">PI ${esc(t.num)}</span>` : ""}</div>${isAdmin() ? `<button class="iconbtn sm" data-act="tnEdit" data-arg="${esc(t.id)}" aria-label="Editar">${ic("edit")}</button>` : ""}</div>
+    <div class="es-tags">${T ? `<span class="pill" style="color:${T.c};border-color:${T.c}55">${esc(T.n)}</span>` : ""}${t.grupo ? `<span class="pill">${esc(t.grupo)}</span>` : ""}${t.emb ? `<span class="pill num">Lata de ${esc(t.emb)}</span>` : ""}</div>
+    ${t.uso ? `<div class="tn-uso"><small>Para que serve</small><span>${esc(t.uso)}</span></div>` : ""}
+    ${t.local ? `<div class="tn-uso tn-local"><small>Onde fica no paiol</small><span>${esc(t.local)}</span></div>` : ""}
+    ${bi ? `<div class="tn-pair"><div><small>Tinta (base)</small><b class="num">${esc(t.num || "—")}</b></div><div class="tn-plus">+</div><div><small>Componente</small><b class="num">${esc(t.comp)}</b><span>${esc(t.compNome || "")}</span></div></div>` : (t.tipo === "epo" || t.tipo === "pu") && !/solvente/i.test(t.nome || "") ? `<div class="sub">${esc(T.n)}: leva o componente (agente de cura) que vem com ela. Confira a numeração do par na lata antes de misturar.</div>` : ""}
+    ${t.prop || t.pot || t.dil ? `<div class="tn-kv">${t.prop ? `<span><small>Proporção</small><b class="num">${esc(t.prop)}</b></span>` : ""}${t.pot ? `<span><small>Vida da mistura</small><b>${esc(t.pot)}</b></span>` : ""}${t.dil ? `<span><small>Diluente</small><b>${esc(t.dil)}</b></span>` : ""}</div>` : ""}
+    ${t.obs ? `<div class="sub">${esc(t.obs)}</div>` : ""}
     ${t.prop && /^\s*\d+([.,]\d+)?\s*:\s*\d+([.,]\d+)?\s*$/.test(t.prop) ? `<button class="btn ghost sm" data-act="tnUsarProp" data-arg="${esc(t.prop + (t.embA && t.embB ? "|" + t.embA + "|" + t.embB : ""))}" style="align-self:flex-start">${ic("calc")}Calcular a mistura com ${esc(t.prop)}</button>` : ""}</div>`;
 }
 function tnModal(id){
-  const t = (tintasData().itens || []).find(x => x.id === id) || {tipo:"epo"};
-  const f = (n, l, ph, v) => `<div class="field"><label for="tn-${n}">${l}</label><input id="tn-${n}" name="${n}" class="input" maxlength="120" placeholder="${ph}" value="${esc(v || "")}"></div>`;
-  openModal(sheetHead(id ? "Editar tinta" : "Adicionar tinta", "Tabela de tintas de bordo") + `<form id="tn-form" class="col" data-id="${esc(id || "")}">
-    <div class="field"><label for="tn-tipo">Tipo</label><select id="tn-tipo" name="tipo" class="input">${Object.entries(TIPOS_TINTA).map(([k, v]) => `<option value="${k}" ${t.tipo === k ? "selected" : ""}>${v.n}</option>`).join("")}</select></div>
-    <div class="fields2">${f("num", "Numeração da tinta (NEB)", "", t.num)}${f("nome", "Nome da tinta", "Ex.: Epóxi alta espessura", t.nome)}</div>
+  const t = (tintasData().itens || []).find(x => x.id === id) || {tipo:"alq"};
+  const f = (n, l, ph, v) => `<div class="field"><label for="tn-${n}">${l}</label><input id="tn-${n}" name="${n}" class="input" maxlength="160" placeholder="${ph}" value="${esc(v || "")}"></div>`;
+  openModal(sheetHead(id ? "Editar tinta" : "Adicionar tinta", "Tintas do paiol") + `<form id="tn-form" class="col" data-id="${esc(id || "")}">
+    <div class="fields2">${f("nome", "Nome / cor da tinta", "Ex.: Cinza Gelo", t.nome)}${f("num", "PI (numeração da lata)", "", t.num)}</div>
+    <div class="fields2"><div class="field"><label for="tn-tipo">Tipo</label><select id="tn-tipo" name="tipo" class="input"><option value="">Não informado</option>${Object.entries(TIPOS_TINTA).filter(([k]) => k !== "out").map(([k, v]) => `<option value="${k}" ${t.tipo === k ? "selected" : ""}>${v.n}</option>`).join("")}</select></div>${f("cor", "Cor (família)", "Ex.: Cinza", t.cor)}</div>
+    ${f("uso", "Para que serve", "Ex.: Anteparas interiores", t.uso)}
+    ${f("local", "Onde fica no paiol", "Ex.: Prateleira 2, lado BB", t.local)}
+    <div class="fields2">${f("grupo", "Área", "Ex.: Convoo e hangar", t.grupo)}${f("emb", "Lata", "Ex.: 3,6 L e 20 L", t.emb)}</div>
     <div class="fields2">${f("comp", "Numeração do componente", "Deixe vazio se não leva", t.comp)}${f("compNome", "Nome do componente", "Ex.: Agente de cura", t.compNome)}</div>
-    <div class="fields2">${f("prop", "Proporção (base:componente)", "Ex.: 1:1 (embalagens)", t.prop)}${f("cor", "Cor", "", t.cor)}</div>
-    <div class="fields2">${f("embA", "Embalagem da base (L)", "Ex.: 20", t.embA)}${f("embB", "Embalagem do componente (L)", "Ex.: 1,5", t.embB)}</div>
-    <div class="fields2">${f("pot", "Vida da mistura (pot life)", "Ex.: 6 h a 25 °C", t.pot)}${f("dil", "Diluente", "", t.dil)}</div>
-    ${f("uso", "Onde usar", "Ex.: convés, porão, costado", t.uso)}${f("obs", "Observação", "", t.obs)}
+    <div class="fields2">${f("prop", "Proporção (base:componente)", "Ex.: 4:1", t.prop)}${f("dil", "Diluente", "", t.dil)}</div>
+    ${f("obs", "Observação", "", t.obs)}
     <div class="row" style="flex-wrap:wrap"><button class="btn primary">${ic("check")}Salvar</button>${id ? `<button type="button" class="btn ghost danger" data-act="tnDel" data-arg="${esc(id)}">${ic("trash")}Apagar</button>` : ""}</div></form>`);
 }
 function tnSalvar(form){
   const v = formVals(form), id = form.dataset.id;
-  if (!String(v.num || "").trim() && !String(v.nome || "").trim()) { toast("Preencha a numeração ou o nome"); return; }
+  if (!String(v.num || "").trim() && !String(v.nome || "").trim()) { toast("Preencha o nome ou o PI"); return; }
   if (!S.content.tintas) S.content.tintas = {key:"tintas", audience:"todos", data:{itens:[]}};
   const L = S.content.tintas.data.itens = S.content.tintas.data.itens || [];
-  const rec = {id:id || "t" + Date.now().toString(36)}; ["tipo", "num", "nome", "comp", "compNome", "prop", "embA", "embB", "cor", "pot", "dil", "uso", "obs"].forEach(k => { const x = String(v[k] || "").trim(); if (x) rec[k] = x; });
+  const old = L.find(x => x.id === id) || {}, rec = {id:id || "t" + Date.now().toString(36)};
+  ["embA", "embB", "pot"].forEach(k => { if (old[k]) rec[k] = old[k]; });
+  ["tipo", "num", "nome", "cor", "uso", "local", "grupo", "emb", "comp", "compNome", "prop", "dil", "obs"].forEach(k => { const x = String(v[k] || "").trim(); if (x) rec[k] = x; });
   const i = L.findIndex(x => x.id === id); if (i >= 0) L[i] = rec; else L.push(rec);
   putContent("tintas"); closeModal(); render(); toast("Tinta salva");
 }
@@ -2914,6 +2941,7 @@ const ACT = {
   tnNova(){ tnModal(null); },
   tnAbrir(a){ S.gq = ""; S.tab = "mar"; S.mar = "tintas"; TN.q = a; render(); scrollTo(0, 0); },
   tnEdit(a){ tnModal(a); },
+  tnCor(a){ TN.q = norm(TN.q).trim() === norm(a) ? "" : a; const i = $("#tn-q"); if (i) i.value = TN.q; document.querySelectorAll("[data-act=tnCor]").forEach(b => b.setAttribute("aria-pressed", norm(b.dataset.arg) === norm(TN.q).trim())); const r = $("#tn-res"); if (r) r.innerHTML = tnRes(tintasData().itens || [], TN.q); },
   tnDel(a){ if (!confirm("Apagar esta tinta da tabela?")) return; const L = tintasData().itens; const i = L.findIndex(x => x.id === a); if (i >= 0) L.splice(i, 1); putContent("tintas"); closeModal(); render(); toast("Tinta apagada"); },
   tnTipo(a){ TN.mix.tipo = a; const y = scrollY; render(); scrollTo(0, y); },
   esGrupo(a){ ES.g = ES.g === a ? null : a; ES.q = ""; const i = $("#es-q"); if (i) i.value = ""; document.querySelectorAll("[data-act=esGrupo]").forEach(b => b.setAttribute("aria-pressed", b.dataset.arg === ES.g)); const r = $("#es-res"); if (r) r.innerHTML = esRes(); },
@@ -3032,7 +3060,7 @@ document.addEventListener("input", ev => {
   if (ev.target.closest("[data-ef]")) { const v = formVals(ev.target.closest("[data-ef]")); if (v.grad2) v.grad = v.grad2; delete v.grad2; Object.assign(EF, v); document.querySelectorAll("#ef-grad,#ef-grad2").forEach(x => { if (x !== ev.target) x.value = EF.grad; });
     [["#ef-pay", efPayOut], ["#ef-casa-out", efCasaOut], ["#ef-car-out", efCarOut]].forEach(([q, f]) => { const o = $(q); if (o) o.innerHTML = f(); }); return; }
   if (ev.target.id === "es-q") { ES.q = ev.target.value; ES.g = null; document.querySelectorAll("[data-act=esGrupo]").forEach(b => b.setAttribute("aria-pressed", "false")); const r = $("#es-res"); if (r) r.innerHTML = esRes(); return; }
-  if (ev.target.id === "tn-q") { TN.q = ev.target.value; const L = tintasData().itens || [], q = norm(TN.q).trim(); const r = $("#tn-res"); if (r) r.innerHTML = tnRes(L, q, q ? L.filter(t => norm([t.num, t.nome, t.comp, t.compNome, t.cor, TIPOS_TINTA[t.tipo] ? TIPOS_TINTA[t.tipo].n : "", t.uso].join(" ")).includes(q)) : []); return; }
+  if (ev.target.id === "tn-q") { TN.q = ev.target.value; const r = $("#tn-res"); if (r) r.innerHTML = tnRes(tintasData().itens || [], TN.q); document.querySelectorAll("[data-act=tnCor]").forEach(b => b.setAttribute("aria-pressed", norm(b.dataset.arg) === norm(TN.q).trim())); return; }
   if (ev.target.closest("[data-tn=mix]")) { tnMixPaint(ev.target.closest("[data-tn=mix]")); return; }
   if (ev.target.id === "rd-q") { clearTimeout(RDQ_T); const v = ev.target.value; RDQ_T = setTimeout(() => apoBuscaRun(v), 250); return; }
   if (ev.target.id === "g-q") { S.gq = ev.target.value; const r = $("#g-res"); r.hidden = !S.gq.trim(); r.innerHTML = S.gq.trim() ? gResults(S.gq) : ""; gApo(S.gq); return; }
