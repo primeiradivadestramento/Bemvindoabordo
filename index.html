@@ -331,6 +331,7 @@ select.input{appearance:none;background-image:linear-gradient(45deg,transparent 
 .sec-title .btn{white-space:nowrap}
 .btn.app-go{background:#fff;color:#0A2A1C;border-color:transparent;font-weight:700}
 .dedic{margin:44px auto 8px;max-width:560px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px}
+.gate .dedic{grid-column:1/-1;margin:8px auto 0}
 .dedic-line{width:64px;height:3px;border-radius:3px;background:var(--brass)}
 .dedic p{margin:0;color:var(--muted);font-style:italic;font-size:15px;line-height:1.55}
 .dedic b{font-family:var(--f-display);font-weight:900;font-size:17px;letter-spacing:.06em;text-transform:uppercase;background:var(--brass);-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -873,6 +874,7 @@ function showGate(){
         ${m === "senha" ? `<button type="button" class="btn ghost sm" data-act="authMode" data-arg="entrar">Voltar para Entrar</button>` : ""}
       </form>
       <div class="gate-foot">Conteúdo de uso interno da divisão.</div></div>
+    <footer class="dedic"><span class="dedic-line"></span><p>Aos marinheiros da Primeira Divisão, que chegam, aprendem e um dia passam adiante o que sabem.</p><p>Dedicado aos que vieram antes e deixaram o caminho mais fácil para os que vêm depois. Alma do Dragão!</p><b>Ataque contínuo e agressivo!</b></footer>
   </div>`;
 }
 document.addEventListener("submit", ev => {
@@ -1026,8 +1028,7 @@ function viewHome(){
       <div class="emblem"><div class="emblem-art">${ART.dragon}</div><div><span class="eyebrow">Mascote do navio</span><b>O Dragão</b><p class="sub">O símbolo do A140. Quem embarca passa a ser parte da Alma do Dragão: uma tripulação só, de proa a popa.</p></div></div>
       <div class="emblem sea"><div class="emblem-art">${ART.trident}</div><div><span class="eyebrow" style="color:#8CC4FA">Mascote da Primeira Divisão</span><b>Poseidon</b><p class="sub">Senhor dos mares. Representa a nossa divisão, na marinharia, nas fainas de convés e no cuidado com o costado.</p></div></div>
     </div>
-    ${adm}
-    <footer class="dedic"><span class="dedic-line"></span><p>Aos marinheiros da Primeira Divisão, que chegam, aprendem e um dia passam adiante o que sabem.</p><b>Ataque contínuo e agressivo!</b></footer>`;
+    ${adm}`;
 }
 /* Destaque logo abaixo do Bem-vindo: o módulo de adestramento em vídeo. O link vem do banco, não do código. */
 function destaqueDrive(mods){
