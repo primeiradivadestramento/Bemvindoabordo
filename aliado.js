@@ -424,7 +424,7 @@ function rotuloOp(G, o){
 
 function viewAliado(){
   carregar();
-  return `<button class="back" data-act="marBack">${ic("left")}Marinharia</button>
+  return `<button class="back" data-act="appBack">${ic("left")}Apps</button>
     <div class="page-h"><span class="eyebrow">Lazer a bordo</span><h1>Aliado</h1><p class="sub" style="font-size:15px">O ludo da Marinha, jogado em duplas com dois dados. Funciona sem internet: dá pra jogar no navio, num celular só.</p></div>
     <div class="seg al-abas" role="group" aria-label="Seções do jogo">${[["jogar", "Jogar"], ["regras", "Regras"], ["girias", "Gírias"]].map(([k, n]) => `<button type="button" data-act="alAba" data-arg="${k}" aria-pressed="${AL.aba === k}">${n}</button>`).join("")}</div>
     <div id="al-root"></div>`;
