@@ -330,6 +330,10 @@ select.input{appearance:none;background-image:linear-gradient(45deg,transparent 
 .appcard a.btn{text-decoration:none}
 .sec-title .btn{white-space:nowrap}
 .btn.app-go{background:#fff;color:#0A2A1C;border-color:transparent;font-weight:700}
+.dedic{margin:44px auto 8px;max-width:560px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px}
+.dedic-line{width:64px;height:3px;border-radius:3px;background:var(--brass)}
+.dedic p{margin:0;color:var(--muted);font-style:italic;font-size:15px;line-height:1.55}
+.dedic b{font-family:var(--f-display);font-weight:900;font-size:17px;letter-spacing:.06em;text-transform:uppercase;background:var(--brass);-webkit-background-clip:text;background-clip:text;color:transparent}
 .appcard.aliado{background:radial-gradient(420px 260px at 0% 0%,rgba(230,70,60,.25),transparent 70%),linear-gradient(135deg,#5A1414,#1E0A0A)}
 .aliado .btn.app-go{background:linear-gradient(90deg,#FFD66B,#F08A3C);color:#2A0E06}
 .desf .btn.app-go{background:linear-gradient(90deg,#3DDC97,#38C8E6);color:#06202A}
@@ -1022,7 +1026,8 @@ function viewHome(){
       <div class="emblem"><div class="emblem-art">${ART.dragon}</div><div><span class="eyebrow">Mascote do navio</span><b>O Dragão</b><p class="sub">O símbolo do A140. Quem embarca passa a ser parte da Alma do Dragão: uma tripulação só, de proa a popa.</p></div></div>
       <div class="emblem sea"><div class="emblem-art">${ART.trident}</div><div><span class="eyebrow" style="color:#8CC4FA">Mascote da Primeira Divisão</span><b>Poseidon</b><p class="sub">Senhor dos mares. Representa a nossa divisão, na marinharia, nas fainas de convés e no cuidado com o costado.</p></div></div>
     </div>
-    ${adm}`;
+    ${adm}
+    <footer class="dedic"><span class="dedic-line"></span><p>Aos marinheiros da Primeira Divisão, que chegam, aprendem e um dia passam adiante o que sabem.</p><b>Ataque contínuo e agressivo!</b></footer>`;
 }
 /* Destaque logo abaixo do Bem-vindo: o módulo de adestramento em vídeo. O link vem do banco, não do código. */
 function destaqueDrive(mods){
