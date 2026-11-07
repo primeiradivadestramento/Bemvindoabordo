@@ -740,6 +740,10 @@ const S = {user:null, member:null, content:{}, members:[], tab:"inicio", mod:nul
 const CACHE = id => "alm-cache:" + id, PEND = "alm-pending", LAST = "alm-lastuser", STEPS = "alm-steps";
 const isAdmin = () => !!(S.member && S.member.approved && S.member.role === "admin");
 const isMember = () => !!(S.member && S.member.approved);
+/* Três contas fixas: admin (encarregado, tudo), mestre (alm_members.mestre: vê tudo e edita só as incumbências) e militar (uso geral, só leitura). */
+const isMestre = () => !!(S.member && S.member.approved && S.member.mestre && S.member.role !== "admin");
+const canInc = () => isAdmin() || isMestre();
+const papel = () => isAdmin() ? "Encarregado" : isMestre() ? "Mestre" : isMember() ? "Uso geral" : "Sem acesso";
 
 function setSync(st){
   S.sync = st;
@@ -754,13 +758,7 @@ function loadCache(id){ const c = lsGet(CACHE(id), null); if (c) { S.member = c.
 async function fetchAll(){
   const m = await sb.from("alm_members").select("*").eq("user_id", S.user.id).maybeSingle();
   if (m.error) throw m.error;
-  S.member = m.data;
-  if (!S.member) {
-    const nome = ((S.user.user_metadata && S.user.user_metadata.alm_nome) || "").slice(0, 40);
-    const ins = await sb.from("alm_members").insert({user_id:S.user.id, email:S.user.email, nome}).select().single();
-    if (ins.error) throw ins.error;
-    S.member = ins.data;
-  }
+  S.member = m.data; /* Ninguém cria conta pelo app: as contas são feitas pelo encarregado. Conta sem cadastro fica sem acesso. */
   if (isMember()) {
     const pend = lsGet(PEND, {});
     const r = await sb.from("alm_content").select("key,audience,data,updated_at");
@@ -850,21 +848,19 @@ function showGate(){
   $("#boot").hidden = true; $("#app").hidden = true; closeModal();
   const g = $("#gate"); g.hidden = false;
   const m = AUTH.mode;
-  const title = {entrar:"Entrar", criar:"Criar conta", senha:"Recuperar senha", nova:"Nova senha"}[m];
-  const sub = {entrar:"Use seu e-mail e senha.", criar:"Depois de criar, seu acesso é liberado pelo encarregado.", senha:"Enviamos um link para criar uma nova senha.", nova:"Escolha a nova senha da sua conta."}[m];
+  const title = {entrar:"Entrar", senha:"Recuperar senha", nova:"Nova senha"}[m];
+  const sub = {entrar:"Use o e-mail e a senha que o encarregado te passou.", senha:"Enviamos um link para criar uma nova senha.", nova:"Escolha a nova senha da sua conta."}[m];
   g.innerHTML = `<div class="gate-in">
     <div class="gate-hero"><img src="icons/icon-512.png" alt="Almanaque da Primeira Divisão">
       <h1>Almanaque da <span>Primeira Divisão</span></h1>
-      <p>Incumbências da divisão e o guia Bem-vindo a Bordo para quem acabou de chegar. Acesso restrito aos militares liberados pelo encarregado.</p></div>
+      <p>Incumbências da divisão e o guia Bem-vindo a Bordo para quem acabou de chegar. Acesso restrito: as contas são distribuídas pelo encarregado.</p></div>
     <div class="gate-card"><h2>${title}</h2><div class="sub" style="margin-bottom:14px">${sub}</div>
       <form class="col" data-auth novalidate>
-        ${m === "entrar" || m === "criar" ? `<div class="seg" role="group" aria-label="Entrar ou criar conta"><button type="button" data-act="authMode" data-arg="entrar" aria-pressed="${m === "entrar"}">Entrar</button><button type="button" data-act="authMode" data-arg="criar" aria-pressed="${m === "criar"}">Criar conta</button></div>` : ""}
-        ${m === "criar" ? `<div class="field"><label for="au-name">Nome de guerra</label><input id="au-name" class="input" maxlength="40" autocomplete="nickname" placeholder="Ex.: Cruz"></div>` : ""}
         ${m !== "nova" ? `<div class="field"><label for="au-email">E-mail</label><input id="au-email" class="input" type="email" inputmode="email" autocomplete="email" value="${esc(AUTH.email)}" placeholder="voce@email.com"></div>` : ""}
         ${m !== "senha" ? `<div class="field"><label for="au-pass">${m === "nova" ? "Nova senha" : "Senha"}</label><input id="au-pass" class="input" type="password" minlength="6" autocomplete="${m === "entrar" ? "current-password" : "new-password"}" placeholder="Mínimo de 6 caracteres"></div>` : ""}
         ${AUTH.msg ? `<div class="note warn">${ic("alert")}<span>${esc(AUTH.msg)}</span></div>` : ""}
         ${AUTH.ok ? `<div class="note good">${ic("check")}<span>${AUTH.ok}</span></div>` : ""}
-        <button class="btn primary" type="submit" ${AUTH.busy ? "disabled" : ""}>${AUTH.busy ? "Aguarde…" : {entrar:"Entrar", criar:"Criar conta", senha:"Enviar link", nova:"Salvar nova senha"}[m]}</button>
+        <button class="btn primary" type="submit" ${AUTH.busy ? "disabled" : ""}>${AUTH.busy ? "Aguarde…" : {entrar:"Entrar", senha:"Enviar link", nova:"Salvar nova senha"}[m]}</button>
         ${m === "entrar" ? `<button type="button" class="btn ghost sm" data-act="authMode" data-arg="senha">Esqueci minha senha</button>` : ""}
         ${m === "senha" ? `<button type="button" class="btn ghost sm" data-act="authMode" data-arg="entrar">Voltar para Entrar</button>` : ""}
       </form>
@@ -882,7 +878,7 @@ document.addEventListener("submit", ev => {
 document.addEventListener("submit", async ev => {
   if (!ev.target.matches("[data-auth]")) return;
   ev.preventDefault(); if (AUTH.busy) return;
-  const email = (($("#au-email") || {}).value || "").trim(), pass = ($("#au-pass") || {}).value || "", name = (($("#au-name") || {}).value || "").trim();
+  const email = (($("#au-email") || {}).value || "").trim(), pass = ($("#au-pass") || {}).value || "";
   const m = AUTH.mode; AUTH.email = email; AUTH.msg = ""; AUTH.ok = "";
   if (m !== "nova" && !/^\S+@\S+\.\S+$/.test(email)) { AUTH.msg = "Digite um e-mail válido."; showGate(); return; }
   if (m !== "senha" && pass.length < 6) { AUTH.msg = "A senha precisa ter pelo menos 6 caracteres."; showGate(); return; }
@@ -890,10 +886,6 @@ document.addEventListener("submit", async ev => {
   const back = location.origin + location.pathname;
   try {
     if (m === "entrar") { const r = await sb.auth.signInWithPassword({email, password:pass}); if (r.error) throw r.error; }
-    else if (m === "criar") {
-      const r = await sb.auth.signUp({email, password:pass, options:{emailRedirectTo:back, data:name ? {alm_nome:name} : {}}}); if (r.error) throw r.error;
-      if (!r.data.session) { AUTH.mode = "entrar"; AUTH.ok = `Enviamos um link de confirmação para <b>${esc(email)}</b>. Abra o e-mail, toque no link e depois entre aqui.`; }
-    }
     else if (m === "senha") { const r = await sb.auth.resetPasswordForEmail(email, {redirectTo:back}); if (r.error) throw r.error; AUTH.ok = "Se esse e-mail tiver conta, o link chega em instantes."; }
     else if (m === "nova") { const r = await sb.auth.updateUser({password:pass}); if (r.error) throw r.error; AUTH.mode = "entrar"; AUTH.busy = false; toast("Senha alterada"); const s = await sb.auth.getSession(); S.user = null; await onSession(s.data.session); return; }
   } catch (e) { AUTH.msg = authMsg(e); }
@@ -909,7 +901,8 @@ function showApp(){
 /* ======================= TELAS ======================= */
 function tabs(){
   const t = [["inicio","Início","home"],["bemvindo","Bem-vindo","anchor"],["mar","Marinharia","rope"],["calc","Calcular","calc"],["apps","Apps","grid"]];
-  if (isAdmin()) t.push(["incumbencias","Incumbências","clip"],["equipe","Equipe","users"]);
+  if (canInc()) t.push(["incumbencias","Incumbências","clip"]);
+  if (isAdmin()) t.push(["equipe","Equipe","users"]);
   t.push(["conta","Conta","user"]);
   return t;
 }
@@ -923,7 +916,7 @@ function render(){
   setSync(S.sync);
   const nome = (S.member && S.member.nome) || "";
   const top = `<div class="topbar"><div class="brand"><img src="icons/icon-192.png" alt=""><div><div class="brand-name">Almanaque</div><div class="brand-sub">Primeira Divisão</div></div></div>
-    <div class="hello-wrap"><div class="hello">${nome ? `Olá, ${esc(nome)}` : "Primeira Divisão"}</div><div class="hello-sub">${isAdmin() ? "Encarregado" : isMember() ? "Militar da divisão" : "Acesso pendente"}</div></div>
+    <div class="hello-wrap"><div class="hello">${nome ? `Olá, ${esc(nome)}` : "Primeira Divisão"}</div><div class="hello-sub">${papel()}</div></div>
     <span class="pill netpill" id="netpill" hidden></span><button class="avatar" data-act="tab" data-arg="conta" aria-label="Sua conta">${nome ? esc(nome[0].toUpperCase()) : ic("user").replace('<svg','<svg width="20" height="20"')}</button></div>`;
   let body;
   if (!isMember()) body = viewPending();
@@ -938,8 +931,8 @@ function render(){
 function viewPending(){
   return `<div class="card col" style="max-width:560px">
     <div class="tile-i">${ic("lock")}</div>
-    <h2 style="font-family:var(--f-display);font-size:20px">Aguardando liberação</h2>
-    <p class="sub" style="font-size:15px">Sua conta foi criada. Peça ao encarregado da Primeira Divisão para liberar seu acesso. Assim que ele aprovar, toque em <b>Verificar de novo</b>.</p>
+    <h2 style="font-family:var(--f-display);font-size:20px">Conta sem acesso</h2>
+    <p class="sub" style="font-size:15px">Esta conta não está liberada no Almanaque. Entre com a conta que o encarregado da Primeira Divisão te passou.</p>
     <div class="row" style="flex-wrap:wrap"><button class="btn primary" data-act="recheck">${ic("reset")}Verificar de novo</button><button class="btn ghost" data-act="logout">${ic("logout")}Sair</button></div></div>`;
 }
 
@@ -984,16 +977,16 @@ function viewHome(){
   const gpct = tot.n ? Math.round(tot.r / tot.n * 100) : 0;
   const next = prontos.find(m => modProgress(m).pct < 100) || prontos[0];
   let adm = "";
-  if (isAdmin() && I) {
+  if (canInc() && I) {
     const st = I.locais.reduce((a, l) => { const s = incStats(l); a.f += s.f; a.t += s.total; a.n += l.itens.length; return a; }, {f:0, t:0, n:0});
     const pct = st.t ? Math.round(st.f / st.t * 100) : 0;
-    adm = `<div class="sec-title" id="h-enc"><h2>Encarregado</h2><span class="pill accent">${ic("lock").replace('<svg','<svg width="12" height="12"')}Só você vê</span></div>
+    adm = `<div class="sec-title" id="h-enc"><h2>${papel()}</h2><span class="pill accent">${ic("lock").replace('<svg','<svg width="12" height="12"')}${isAdmin() ? "Só você vê" : "Só o mestre e o encarregado veem"}</span></div>
       ${pend ? `<button class="note warn" data-act="tab" data-arg="equipe" style="text-align:left;cursor:pointer;color:var(--ink)">${ic("users")}<span><b>${pend} ${pend === 1 ? "militar aguarda" : "militares aguardam"} liberação.</b> Toque para ver.</span></button>` : ""}
       <div class="grid"><button class="tile" data-act="tab" data-arg="incumbencias"><div class="tile-i">${ic("clip")}</div><b>Incumbências</b><div class="sub">${I.locais.length} locais · ${st.n} itens</div><div class="foot"><div class="bar"><i style="width:${pct}%"></i></div><span class="num sub">${pct}%</span></div></button>
-      <button class="tile" data-act="tab" data-arg="equipe"><div class="tile-i">${ic("users")}</div><b>Equipe</b><div class="sub">${S.members.filter(m => m.approved).length} com acesso${pend ? ` · ${pend} aguardando` : ""}</div><div class="foot"><span class="sub">Liberar quem chegou</span>${ic("chev").replace('<svg','<svg width="18" height="18"')}</div></button></div>`;
+      ${isAdmin() ? `<button class="tile" data-act="tab" data-arg="equipe"><div class="tile-i">${ic("users")}</div><b>Equipe</b><div class="sub">${S.members.filter(m => m.approved).length} com acesso${pend ? ` · ${pend} aguardando` : ""}</div><div class="foot"><span class="sub">Contas do app</span>${ic("chev").replace('<svg','<svg width="18" height="18"')}</div></button>` : ""}</div>`;
   }
   const menu = [["h-guia", "Guia", "anchor"], ["h-vida", "Qualidade de vida", "heart"], ["h-mar", "Marinharia", "rope"], ["h-ferr", "Ferramentas", "calc"], ["h-simb", "Símbolos", "ship"]];
-  if (adm) menu.push(["h-enc", "Encarregado", "lock"]);
+  if (adm) menu.push(["h-enc", papel(), "lock"]);
   return `<div class="homebar">
       <div class="gsearch">${ic("search")}<input id="g-q" type="search" placeholder="Buscar em todo o app" autocomplete="off" aria-label="Buscar em todo o app" value="${esc(S.gq || "")}">${S.gq ? `<button class="iconbtn sm" data-act="gClear" aria-label="Limpar busca">${ic("x")}</button>` : ""}</div>
       <nav class="hmenu" aria-label="Atalhos do Início">${menu.map(([id, n, i]) => `<button data-act="jump" data-arg="${id}">${ic(i)}${n}</button>`).join("")}<button data-act="tab" data-arg="bemvindo">${ic("book")}Bem-vindo</button><button data-act="tab" data-arg="apps">${ic("grid")}Apps</button></nav>
@@ -1051,7 +1044,7 @@ function gIndex(){
     E.push({tipo:"Bem-vindo", t:m.titulo, sub:m.subtitulo || "", txt:[m.titulo, m.subtitulo, m.resumo].join(" "), act:"gMod", arg:m.id, i:-1});
     (m.secoes || []).forEach((s, i) => E.push({tipo:"Bem-vindo", t:s.titulo, sub:m.titulo, txt:[s.titulo, ...(s.blocos || []).map(blkTexto)].join(" "), act:"gMod", arg:m.id, i}));
   });
-  const I = isAdmin() && inc();
+  const I = canInc() && inc();
   if (I) I.locais.forEach(l => {
     E.push({tipo:"Incumbências", t:l.nome, sub:"Local", txt:[l.nome, l.descricao, ...(l.checklists || []).map(c => [c.titulo, ...c.itens].join(" "))].join(" "), act:"local", arg:l.id});
     l.itens.forEach(it => E.push({tipo:"Incumbências", t:it.nome, sub:l.nome + (it.pasta ? " · " + it.pasta : ""), txt:[it.nome, it.pasta, it.obs, ...Object.entries(it.campos || {}).map(([k, v]) => k + " " + v)].join(" "), act:"gItem", arg:l.id, i:it.id}));
@@ -2540,8 +2533,6 @@ function finCards(full){
 /* ---------- apps da tripulação ---------- */
 /* Prévia de cada app: foto da página inicial (icons/apps) e o ícone. O link pode ser trocado pelo encarregado. */
 const APPS = [
-  {id:"desfrangolizador", nome:"Desfrangolizador", tag:"Qualidade de vida", cor:"desf", resumo:"Treino de hipertrofia, dieta flexível e evolução do corpo em um só app. Para aguentar a rotina de bordo com saúde.",
-    url:"https://fernandocruzjr.github.io/Desfrangolizador/", telas:[{img:"desfrangolizador.jpg", t:"Página inicial"}]},
   {id:"hifamily", nome:"Hi Family", tag:"Inglês", cor:"hi", resumo:"Inglês para toda a família, com lições curtas, áudio e quiz. Tem a área Inglês Naval: vocabulário de bordo, rádio, manobra e cerimonial.",
     url:"https://poliglotamais.vercel.app/", telas:[{img:"hifamily.jpg", t:"Página inicial"}, {img:"hifamily-naval.jpg", t:"Inglês Naval", path:"#/marinha"}]}
 ];
@@ -2898,8 +2889,8 @@ const START = [];
 function viewEquipe(){
   const pend = S.members.filter(m => !m.approved), ok = S.members.filter(m => m.approved);
   const row = m => `<div class="item" style="cursor:default"><div class="item-main"><b>${esc(m.nome || (m.email || "").split("@")[0])}</b><span class="sub">${esc(m.email || "")}</span></div>
-    ${m.role === "admin" ? `<span class="pill accent">Encarregado</span>` : m.approved ? `<button class="btn sm ghost danger" data-act="memberOff" data-arg="${m.user_id}">Remover acesso</button>` : `<button class="btn sm primary" data-act="memberOn" data-arg="${m.user_id}">${ic("check")}Liberar</button><button class="iconbtn" data-act="memberDel" data-arg="${m.user_id}" aria-label="Recusar">${ic("x")}</button>`}</div>`;
-  return `<div class="page-h"><span class="eyebrow">Acesso</span><h1>Equipe</h1><p class="sub" style="font-size:15px">Quem cria conta no app fica aguardando até você liberar. Militares liberados veem o Bem-vindo a Bordo. As incumbências continuam só com você.</p></div>
+    ${m.role === "admin" ? `<span class="pill accent">Encarregado</span>` : m.approved ? `<span class="pill">${m.mestre ? "Mestre" : "Uso geral"}</span>` : ""}${m.role === "admin" ? "" : m.approved ? `<button class="btn sm ghost danger" data-act="memberOff" data-arg="${m.user_id}">Remover acesso</button>` : `<button class="btn sm primary" data-act="memberOn" data-arg="${m.user_id}">${ic("check")}Liberar</button><button class="iconbtn" data-act="memberDel" data-arg="${m.user_id}" aria-label="Recusar">${ic("x")}</button>`}</div>`;
+  return `<div class="page-h"><span class="eyebrow">Acesso</span><h1>Equipe</h1><p class="sub" style="font-size:15px">O app não tem cadastro aberto: são três contas, criadas por você no Supabase. Encarregado edita tudo, Mestre edita só as incumbências e Uso geral só vê. Remover o acesso bloqueia a conta na hora.</p></div>
     <div class="row"><button class="btn sm" data-act="membersReload">${ic("reset")}Atualizar</button></div>
     <div class="card"><div class="card-h"><h2>Aguardando liberação</h2><span class="pill ${pend.length ? "warn" : ""}">${pend.length}</span></div><div class="items">${pend.map(row).join("") || `<div class="empty">Ninguém aguardando.</div>`}</div></div>
     <div class="card"><div class="card-h"><h2>Com acesso</h2><span class="pill">${ok.length}</span></div><div class="items">${ok.map(row).join("")}</div></div>`;
@@ -2918,8 +2909,8 @@ function installNote(){
 }
 function viewConta(){
   return `<div class="page-h"><span class="eyebrow">Sua conta</span><h1>Conta</h1></div>
-    <div class="card col"><div><b>${esc(S.user.email || "")}</b><div class="sub">${isAdmin() ? "Encarregado da divisão" : isMember() ? "Acesso liberado" : "Aguardando liberação"}</div></div>
-      <div class="field"><label for="f-nick">Nome de guerra</label><div class="row"><input id="f-nick" class="input" maxlength="40" value="${esc((S.member && S.member.nome) || "")}"><button class="btn" data-act="saveNick">Salvar</button></div></div>
+    <div class="card col"><div><b>${esc(S.user.email || "")}</b><div class="sub">${papel()}</div></div>
+      ${isAdmin() ? `<div class="field"><label for="f-nick">Nome de guerra</label><div class="row"><input id="f-nick" class="input" maxlength="40" value="${esc((S.member && S.member.nome) || "")}"><button class="btn" data-act="saveNick">Salvar</button></div></div>` : ""}
       <div class="note">${ic("lock")}<span>O conteúdo fica guardado neste aparelho para abrir sem internet. Ao sair da conta, ele é apagado do aparelho.</span></div>
       ${installNote()}
       <button class="btn ghost danger" data-act="logout" style="align-self:flex-start">${ic("logout")}Sair da conta</button></div>`;
@@ -3032,7 +3023,7 @@ const ACT = {
   memberOff(a){ if (confirm("Remover o acesso deste militar?")) memberUpdate(a, {approved:false}); },
   memberDel(a){ if (confirm("Recusar este pedido?")) memberUpdate(a, null); },
   async membersReload(){ await loadMembers(); render(); },
-  async recheck(){ try { await fetchAll(); render(); if (!isMember()) toast("Ainda aguardando liberação"); } catch (e) { toast("Sem conexão"); } },
+  async recheck(){ try { await fetchAll(); render(); if (!isMember()) toast("Esta conta continua sem acesso"); } catch (e) { toast("Sem conexão"); } },
   async saveNick(){ const v = $("#f-nick").value.trim().slice(0, 40); const r = await sb.rpc("alm_set_nome", {novo:v}); if (r.error) { toast(navigator.onLine ? "Não deu certo agora" : "Sem conexão"); return; } S.member.nome = v; saveCache(); render(); toast("Salvo"); },
   async logout(){
     if (Object.keys(lsGet(PEND, {})).length && !confirm("Há alterações que ainda não foram enviadas. Sair mesmo assim?")) return;

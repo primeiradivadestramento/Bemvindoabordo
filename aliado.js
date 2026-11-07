@@ -1,7 +1,7 @@
 /* ============================================================
    Aliado: o ludo tradicional da Marinha, jogado em duplas.
    Tudo roda no aparelho (sem internet). A partida em andamento fica salva no próprio aparelho.
-   Tabuleiro 19x19 desenhado a partir da lona que o Fernando mandou. Nos cantos, as cores dos clubes (sem escudos).
+   Tabuleiro 19x19 desenhado a partir da lona da divisão. Nos cantos, as cores dos clubes (sem escudos).
    ============================================================ */
 (function(){
 "use strict";
@@ -52,7 +52,7 @@ const RING = (() => {
   for (const [dr, dc, n] of seg) for (let i = 0; i < n; i++) { out.push([r, c]); r += dr; c += dc; }
   return out;
 })();
-/* Caminho do Fluminense (riscado pelo Fernando): sai na casa azul do canto (3,0), dá a volta toda por fora, entra no M,
+/* Caminho do Fluminense (riscado na lona): sai na casa azul do canto (3,0), dá a volta toda por fora, entra no M,
    desce até a caveira, dá a volta inteira pelo caminho de dentro (passando pelas outras três caveiras e pelas casinhas
    vermelhas de ligação) e entra no braço de cima à esquerda até o centro. */
 const PORTA = 3; // índice no anel da casa de saída do paiol

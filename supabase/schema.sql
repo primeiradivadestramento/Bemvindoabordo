@@ -68,3 +68,24 @@ create or replace function public.alm_set_nome(novo text) returns void language 
 $$;
 revoke all on function public.alm_set_nome(text) from public, anon;
 grant execute on function public.alm_set_nome(text) to authenticated;
+
+-- Três contas fixas (07/11/2026): sem cadastro aberto. As contas são criadas pelo encarregado em
+-- Authentication → Users e ligadas aqui: admin (tudo), mestre (vê tudo e edita só as incumbências) e militar (uso geral, só leitura).
+alter table public.alm_members add column if not exists mestre boolean not null default false;
+create or replace function public.alm_is_mestre() returns boolean language sql stable security definer set search_path = '' as $$
+  select exists (select 1 from public.alm_members where user_id = (select auth.uid()) and approved and mestre);
+$$;
+revoke all on function public.alm_is_mestre() from public, anon;
+grant execute on function public.alm_is_mestre() to authenticated;
+alter policy "alm pedir acesso" on public.alm_members with check (false);
+alter policy "alm ler conteúdo" on public.alm_content
+  using ((audience = 'todos' and (select public.alm_is_member())) or (select public.alm_is_admin())
+         or (key = 'incumbencias' and (select public.alm_is_mestre())));
+create policy "alm mestre cria incumbências" on public.alm_content for insert to authenticated
+  with check (key = 'incumbencias' and audience = 'admin' and (select public.alm_is_mestre()));
+create policy "alm mestre altera incumbências" on public.alm_content for update to authenticated
+  using (key = 'incumbencias' and (select public.alm_is_mestre()))
+  with check (key = 'incumbencias' and audience = 'admin' and (select public.alm_is_mestre()));
+-- Ligar as contas (troque os e-mails):
+-- insert into public.alm_members (user_id, email, role, approved, mestre)
+--   select id, email, 'admin', true, false from auth.users where email = 'admin@exemplo.com';
