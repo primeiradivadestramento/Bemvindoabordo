@@ -89,3 +89,6 @@ create policy "alm mestre altera incumbências" on public.alm_content for update
 -- Ligar as contas (troque os e-mails):
 -- insert into public.alm_members (user_id, email, role, approved, mestre)
 --   select id, email, 'admin', true, false from auth.users where email = 'admin@exemplo.com';
+
+-- Uso geral também VÊ as incumbências (só leitura; editar continua só mestre e encarregado).
+alter policy "alm ler conteúdo" on public.alm_content using ((audience = 'todos' and public.alm_is_member()) or public.alm_is_admin() or (key = 'incumbencias' and public.alm_is_member()));

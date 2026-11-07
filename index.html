@@ -742,7 +742,8 @@ const isAdmin = () => !!(S.member && S.member.approved && S.member.role === "adm
 const isMember = () => !!(S.member && S.member.approved);
 /* Três contas fixas: admin (encarregado, tudo), mestre (alm_members.mestre: vê tudo e edita só as incumbências) e militar (uso geral, só leitura). */
 const isMestre = () => !!(S.member && S.member.approved && S.member.mestre && S.member.role !== "admin");
-const canInc = () => isAdmin() || isMestre();
+const canInc = () => isAdmin() || isMestre(); /* editar incumbências */
+const seeInc = () => isMember(); /* ver incumbências: todas as contas, inclusive uso geral (só leitura) */
 const papel = () => isAdmin() ? "Encarregado" : isMestre() ? "Mestre" : isMember() ? "Uso geral" : "Sem acesso";
 
 function setSync(st){
@@ -779,6 +780,7 @@ async function loadMembers(){
 /* Salvar conteúdo (só admin): guarda no aparelho na hora e envia quando houver conexão. */
 let saveTimer = null;
 function putContent(key){
+  if (key === "incumbencias" ? !canInc() : !isAdmin()) { toast("Sua conta é só de leitura"); return; }
   S.content[key].updated_at = new Date().toISOString();
   const pend = lsGet(PEND, {}); pend[key] = true; lsSet(PEND, pend);
   saveCache(); setSync("saving");
@@ -901,7 +903,7 @@ function showApp(){
 /* ======================= TELAS ======================= */
 function tabs(){
   const t = [["inicio","Início","home"],["bemvindo","Bem-vindo","anchor"],["mar","Marinharia","rope"],["calc","Calcular","calc"],["apps","Apps","grid"]];
-  if (canInc()) t.push(["incumbencias","Incumbências","clip"]);
+  if (seeInc()) t.push(["incumbencias","Incumbências","clip"]);
   if (isAdmin()) t.push(["equipe","Equipe","users"]);
   t.push(["conta","Conta","user"]);
   return t;
@@ -977,10 +979,10 @@ function viewHome(){
   const gpct = tot.n ? Math.round(tot.r / tot.n * 100) : 0;
   const next = prontos.find(m => modProgress(m).pct < 100) || prontos[0];
   let adm = "";
-  if (canInc() && I) {
+  if (seeInc() && I) {
     const st = I.locais.reduce((a, l) => { const s = incStats(l); a.f += s.f; a.t += s.total; a.n += l.itens.length; return a; }, {f:0, t:0, n:0});
     const pct = st.t ? Math.round(st.f / st.t * 100) : 0;
-    adm = `<div class="sec-title" id="h-enc"><h2>${papel()}</h2><span class="pill accent">${ic("lock").replace('<svg','<svg width="12" height="12"')}${isAdmin() ? "Só você vê" : "Só o mestre e o encarregado veem"}</span></div>
+    adm = `<div class="sec-title" id="h-enc"><h2>${papel()}</h2><span class="pill accent">${ic("lock").replace('<svg','<svg width="12" height="12"')}${isAdmin() ? "Você edita" : isMestre() ? "Você edita as incumbências" : "Só leitura"}</span></div>
       ${pend ? `<button class="note warn" data-act="tab" data-arg="equipe" style="text-align:left;cursor:pointer;color:var(--ink)">${ic("users")}<span><b>${pend} ${pend === 1 ? "militar aguarda" : "militares aguardam"} liberação.</b> Toque para ver.</span></button>` : ""}
       <div class="grid"><button class="tile" data-act="tab" data-arg="incumbencias"><div class="tile-i">${ic("clip")}</div><b>Incumbências</b><div class="sub">${I.locais.length} locais · ${st.n} itens</div><div class="foot"><div class="bar"><i style="width:${pct}%"></i></div><span class="num sub">${pct}%</span></div></button>
       ${isAdmin() ? `<button class="tile" data-act="tab" data-arg="equipe"><div class="tile-i">${ic("users")}</div><b>Equipe</b><div class="sub">${S.members.filter(m => m.approved).length} com acesso${pend ? ` · ${pend} aguardando` : ""}</div><div class="foot"><span class="sub">Contas do app</span>${ic("chev").replace('<svg','<svg width="18" height="18"')}</div></button>` : ""}</div>`;
@@ -1044,7 +1046,7 @@ function gIndex(){
     E.push({tipo:"Bem-vindo", t:m.titulo, sub:m.subtitulo || "", txt:[m.titulo, m.subtitulo, m.resumo].join(" "), act:"gMod", arg:m.id, i:-1});
     (m.secoes || []).forEach((s, i) => E.push({tipo:"Bem-vindo", t:s.titulo, sub:m.titulo, txt:[s.titulo, ...(s.blocos || []).map(blkTexto)].join(" "), act:"gMod", arg:m.id, i}));
   });
-  const I = canInc() && inc();
+  const I = seeInc() && inc();
   if (I) I.locais.forEach(l => {
     E.push({tipo:"Incumbências", t:l.nome, sub:"Local", txt:[l.nome, l.descricao, ...(l.checklists || []).map(c => [c.titulo, ...c.itens].join(" "))].join(" "), act:"local", arg:l.id});
     l.itens.forEach(it => E.push({tipo:"Incumbências", t:it.nome, sub:l.nome + (it.pasta ? " · " + it.pasta : ""), txt:[it.nome, it.pasta, it.obs, ...Object.entries(it.campos || {}).map(([k, v]) => k + " " + v)].join(" "), act:"gItem", arg:l.id, i:it.id}));
@@ -1259,11 +1261,11 @@ function viewInc(){
     I.locais.forEach(l => l.itens.forEach(it => { const hay = norm([l.nome, it.nome, it.obs, ...Object.values(it.campos || {})].join(" ")); if (hay.includes(q)) hits.push([l, it]); }));
     results = `<div class="col"><div class="sub">${hits.length} ${hits.length === 1 ? "resultado" : "resultados"}</div><div class="items">${hits.map(([l, it]) => itemRow(l, it, true)).join("") || `<div class="empty">Nada encontrado.</div>`}</div></div>`;
   }
-  return `<div class="page-h"><span class="eyebrow">${ic("lock").replace('<svg','<svg style="display:inline;vertical-align:-2px" width="12" height="12"')} Só você vê</span><h1>Incumbências</h1><p class="sub" style="font-size:15px">Material de cada local da divisão. Toque em um item para preencher as medidas.</p></div>
+  return `<div class="page-h"><span class="eyebrow">${ic("lock").replace('<svg','<svg style="display:inline;vertical-align:-2px" width="12" height="12"')} ${canInc() ? "Você pode editar" : "Só leitura"}</span><h1>Incumbências</h1><p class="sub" style="font-size:15px">Material de cada local da divisão. ${canInc() ? "Toque em um item para preencher as medidas." : "Toque em um item para ver as medidas."}</p></div>
     <div class="search">${ic("search")}<input class="input" id="inc-q" type="search" placeholder="Buscar item, local ou medida" value="${esc(S.q)}" autocomplete="off"></div>
     ${results ? "" : `<div class="row"><button class="btn sm" data-act="pdf" data-arg="">${ic("pdf")}PDF de todas as incumbências</button></div>`}
     ${results || `<div class="grid">${I.locais.map(l => { const s = incStats(l); return `<button class="tile" data-act="local" data-arg="${esc(l.id)}"><b>${esc(l.nome)}</b><div class="sub">${l.itens.length} ${l.itens.length === 1 ? "item" : "itens"}</div><div class="foot"><div class="bar"><i style="width:${s.pct}%"></i></div><span class="num sub">${s.pct}%</span></div></button>`; }).join("")}
-      <button class="tile" data-act="localNew" style="align-items:center;justify-content:center;border-style:dashed;color:var(--muted)">${ic("plus")}<span>Novo local</span></button></div>`}`;
+      ${canInc() ? `<button class="tile" data-act="localNew" style="align-items:center;justify-content:center;border-style:dashed;color:var(--muted)">${ic("plus")}<span>Novo local</span></button>` : ""}</div>`}`;
 }
 function itemRow(l, it, showLocal){
   const cols = itemCols(l, it), filled = cols.filter(c => String((it.campos || {})[c] || "").trim());
@@ -1282,9 +1284,10 @@ function viewLocal(l){
     <div class="page-h"><span class="eyebrow">Local</span><h1>${esc(l.nome)}</h1>${l.descricao ? `<p class="sub" style="font-size:15px">${esc(l.descricao)}</p>` : ""}<p class="sub">${l.itens.length} itens · ${s.pct}% das medidas preenchidas</p></div>
     ${(l.checklists || []).map(c => `<details class="sec" data-chk="${esc(c.id)}" ${OPEN_CHK.includes(c.id) ? "open" : ""}><summary><span class="sec-n">${ic("check").replace('<svg','<svg width="16" height="16"')}</span><b>${esc(c.titulo)}</b><span class="pill">${stepsDone(c.id).length}/${c.itens.length}</span>${ic("down")}</summary><div class="sec-body">${blk({tipo:"passos", id:c.id, itens:c.itens})}</div></details>`).join("")}
     ${S.sel ? `<div class="note">${ic("folder")}<span>Toque nos itens que quer juntar e depois em <b>Mover para pasta</b>.</span></div>`
+      : !canInc() ? `<div class="row"><button class="btn sm" data-act="pdf" data-arg="${esc(l.id)}">${ic("pdf")}Gerar PDF</button></div>`
       : `<div class="row" style="flex-wrap:wrap"><button class="btn primary sm" data-act="itemNew" data-arg="${esc(l.id)}">${ic("plus")}Novo item</button><button class="btn sm" data-act="organize">${ic("folder")}Organizar em pastas</button><button class="btn sm" data-act="localEdit" data-arg="${esc(l.id)}">${ic("columns")}Local e campos</button><button class="btn sm" data-act="pdf" data-arg="${esc(l.id)}">${ic("pdf")}Gerar PDF</button></div>`}
     ${pastasDe(l).map(pa => { const its = l.itens.filter(it => it.pasta === pa), open = S.sel || OPEN_PASTA.includes(l.id + "/" + pa);
-      return `<details class="sec folder" data-pasta="${esc(l.id + "/" + pa)}" ${open ? "open" : ""}><summary><span class="sec-n">${ic("folder").replace('<svg','<svg width="16" height="16"')}</span><b>${esc(pa)}</b><span class="pill">${its.length}</span>${S.sel ? "" : `<span class="iconbtn sm" role="button" tabindex="0" data-act="pastaEdit" data-arg="${esc(pa)}" aria-label="Editar pasta e campos">${ic("edit")}</span>`}${ic("down")}</summary><div class="sec-body"><div class="items">${its.map(it => itemRow(l, it)).join("")}</div></div></details>`; }).join("")}
+      return `<details class="sec folder" data-pasta="${esc(l.id + "/" + pa)}" ${open ? "open" : ""}><summary><span class="sec-n">${ic("folder").replace('<svg','<svg width="16" height="16"')}</span><b>${esc(pa)}</b><span class="pill">${its.length}</span>${S.sel || !canInc() ? "" : `<span class="iconbtn sm" role="button" tabindex="0" data-act="pastaEdit" data-arg="${esc(pa)}" aria-label="Editar pasta e campos">${ic("edit")}</span>`}${ic("down")}</summary><div class="sec-body"><div class="items">${its.map(it => itemRow(l, it)).join("")}</div></div></details>`; }).join("")}
     <div class="items">${l.itens.filter(it => !it.pasta).map(it => itemRow(l, it)).join("") || (l.itens.length ? "" : `<div class="empty">Nenhum item.</div>`)}</div>
     ${S.sel ? `<div class="selbar"><span><b class="num">${S.sel.length}</b> ${S.sel.length === 1 ? "item" : "itens"}</span><button class="btn sm ghost" data-act="organizeEnd">Cancelar</button><button class="btn sm primary" data-act="moveOpen" ${S.sel.length ? "" : "disabled"}>${ic("folder")}Mover para pasta</button></div>` : ""}`;
 }
@@ -1323,6 +1326,15 @@ function pastaModal(pa){
 function itemModal(lid, iid){
   const l = inc().locais.find(x => x.id === lid); if (!l) return;
   const it = iid ? l.itens.find(x => x.id === iid) : {id:"", nome:"", campos:{}, obs:""};
+  if (!canInc()) { /* uso geral: só vê o item */
+    if (!iid) return;
+    const cols = itemCols(l, it);
+    openModal(`${sheetHead(it.nome, l.nome + (it.pasta ? " › " + it.pasta : ""))}
+      <div class="col"><div class="kv" style="flex-direction:column;gap:8px">${cols.map(c => `<span>${esc(c)}: <em>${esc((it.campos || {})[c] || "—")}</em></span>`).join("") || `<span class="empty">Sem medidas.</span>`}</div>
+      ${it.obs ? `<div class="field"><label>Observações</label><div style="white-space:pre-line">${esc(it.obs)}</div></div>` : ""}
+      <div class="note">${ic("lock")}<span>Só leitura. Quem altera as incumbências é o mestre ou o encarregado.</span></div></div>`);
+    return;
+  }
   openModal(`${sheetHead(iid ? it.nome : "Novo item", l.nome)}
     <form class="col" data-form="item" data-l="${esc(lid)}" data-i="${esc(iid || "")}">
       <div class="field"><label for="f-nome">Nome do item</label><input id="f-nome" name="nome" class="input" required maxlength="80" value="${esc(it.nome)}"></div>
@@ -1350,6 +1362,7 @@ document.addEventListener("submit", ev => {
   const f = ev.target, kind = f.dataset.form; if (!kind) return;
   ev.preventDefault();
   if (kind === "fin") { saveFin(new FormData(f)); return; }
+  if (!canInc()) { toast("Sua conta é só de leitura"); closeModal(); return; }
   const I = inc(), fd = new FormData(f);
   if (kind === "item") {
     const l = I.locais.find(x => x.id === f.dataset.l); if (!l) return;
@@ -2978,7 +2991,7 @@ const ACT = {
   modBack(){ S.mod = null; render(); },
   local(a){ S.gq = ""; S.tab = "incumbencias"; S.local = a; render(); scrollTo(0, 0); },
   localBack(){ S.local = null; S.sel = null; render(); },
-  organize(){ S.sel = []; render(); },
+  organize(){ if (!canInc()) return; S.sel = []; render(); },
   modNew(){ if (!S.content.bemvindo) S.content.bemvindo = {key:"bemvindo", audience:"todos", data:{modulos:[]}}; modModal(true); },
   modEdit(){ modModal(false); },
   aplicarPorques(){ const m = (bem().modulos || []).find(x => x.id === "curiosidades"); if (!m) return; m.titulo = PQ_TITULO; m.subtitulo = "Porquês e linguagem de bordo"; m.resumo = "Por que o navio flutua? Por que o casco não é de inox? Os porquês do mar e os termos de bordo."; m.secoes = m.secoes || []; m.secoes = m.secoes.filter(x => x.titulo !== PORQUES.titulo); m.secoes.unshift(clone(PORQUES));
@@ -3009,13 +3022,13 @@ const ACT = {
   pick(a){ S.sel = S.sel.includes(a) ? S.sel.filter(x => x !== a) : [...S.sel, a]; const y = scrollY; render(); scrollTo(0, y); },
   moveOpen(){ if (S.sel && S.sel.length) moveModal(); },
   moveTo(a){ moveTo(a); },
-  pastaEdit(a){ pastaModal(a); },
+  pastaEdit(a){ if (!canInc()) return; pastaModal(a); },
   pastaDel(a){ const l = curLocal(); l.itens.forEach(it => { if (it.pasta === a) delete it.pasta; }); if (l.pastaCols) delete l.pastaCols[a]; putContent("incumbencias"); closeModal(); render(); toast("Pasta apagada"); },
   item(a, el){ itemModal(a, el.dataset.i); },
-  itemNew(a){ itemModal(a); },
+  itemNew(a){ if (!canInc()) return; itemModal(a); },
   itemDel(a, el){ if (!confirm("Apagar este item?")) return; const l = inc().locais.find(x => x.id === a); l.itens = l.itens.filter(x => x.id !== el.dataset.i); putContent("incumbencias"); closeModal(); render(); },
-  localNew(){ localModal(); },
-  localEdit(a){ localModal(a); },
+  localNew(){ if (!canInc()) return; localModal(); },
+  localEdit(a){ if (!canInc()) return; localModal(a); },
   localDel(a){ const I = inc(), l = I.locais.find(x => x.id === a); if (!confirm(`Apagar o local "${l.nome}" e os ${l.itens.length} itens dele?`)) return; I.locais = I.locais.filter(x => x.id !== a); S.local = null; putContent("incumbencias"); closeModal(); render(); },
   step(a, el){ const all = lsGet(STEPS, {}), d = all[a] || [], i = +el.dataset.i; all[a] = d.includes(i) ? d.filter(x => x !== i) : [...d, i]; lsSet(STEPS, all); const y = scrollY; render(); scrollTo(0, y); },
   stepReset(a){ const all = lsGet(STEPS, {}); delete all[a]; lsSet(STEPS, all); const y = scrollY; render(); scrollTo(0, y); },
