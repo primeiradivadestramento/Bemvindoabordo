@@ -562,6 +562,67 @@ select.input{appearance:none;background-image:linear-gradient(45deg,transparent 
 .rl span{color:var(--muted)}
 .rl.tot span{color:var(--ink);font-weight:700}
 .rl.tot b{color:var(--accent-ink)}
+/* Corrosão e pintura (pintura.js) */
+.cp-abas{max-width:none}
+.cp-p{font-size:14.5px;line-height:1.55;color:var(--ink)}
+.cp-sec .lst{font-size:14.5px}
+.cp-fig{margin:0;display:flex;flex-direction:column;gap:6px;min-width:0}
+.cp-fig figcaption{font-size:12.5px;color:var(--muted);line-height:1.35}
+.cp-img{display:block;width:100%;padding:0;border:1px solid var(--glass-b);border-radius:12px;overflow:hidden;background:#0b1a28;cursor:zoom-in}
+.cp-img img{display:block;width:100%;height:190px;object-fit:cover}
+.cp-fig.light .cp-img{background:#fff}.cp-fig.light .cp-img img{object-fit:contain;padding:6px}
+.cp-fig.wide .cp-img img{height:auto;max-height:260px}
+.cp-zoom{display:block;width:100%;max-height:75vh;object-fit:contain;border-radius:12px;background:#fff}
+.cp-split{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:16px;align-items:start}
+.cp-duo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.cp-tri{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.cp-box{display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:14px;background:var(--glass);border:1px solid var(--glass-b);font-size:14px;line-height:1.45}
+.cp-box>b{font-family:var(--f-display);font-size:15.5px}
+.cp-box.bad{border-left:4px solid var(--bad)}.cp-box.good{border-left:4px solid var(--good)}
+.cp-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.cp-card{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:14px;background:var(--glass);border:1px solid var(--glass-b);font-size:14px;line-height:1.45}
+.cp-card .cp-fig figcaption{display:none}
+.cp-card>b{font-family:var(--f-display);font-size:15.5px}.cp-card small{color:var(--muted);font-size:13px}
+.cp-graus{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.cp-grau{display:flex;flex-direction:column;gap:6px;font-size:13.5px;line-height:1.4}.cp-grau .cp-fig figcaption{display:none}.cp-grau .cp-img img{height:130px}
+.cp-grau>b{font-family:var(--f-display);font-size:15px}
+.cp-limp{display:flex;flex-direction:column;gap:10px}
+.cp-limp-i{display:grid;grid-template-columns:180px minmax(0,1fr);gap:14px;align-items:start;padding:12px;border-radius:14px;background:var(--glass);border:1px solid var(--glass-b);font-size:14px;line-height:1.45}
+.cp-limp-i .cp-fig figcaption{display:none}.cp-limp-i .cp-img img{height:120px}.cp-limp-i b{font-family:var(--f-display);font-size:15.5px}.cp-limp-i small{color:var(--muted)}
+.cp-pilha{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:center}
+.cp-svg{width:100%;height:auto;max-width:420px}
+.cp-pilha-l{display:flex;flex-direction:column;gap:10px}.cp-pilha-l>div{display:flex;flex-direction:column;gap:2px;font-size:14px;line-height:1.45}
+.cp-pilha-l b{font-family:var(--f-display)}.cp-pilha-l b.bad{color:var(--bad)}.cp-pilha-l b.good{color:var(--good)}.cp-pilha-l b.blue{color:var(--blue)}
+.cp-nob{display:flex;flex-direction:column;gap:4px;max-width:520px}
+.cp-nob-i{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;font-size:14px;background:var(--glass);border-left:4px solid var(--warn)}
+.cp-nob-i.a{border-left-color:var(--bad)}.cp-nob-i.n{border-left-color:var(--good)}.cp-nob-i .num{color:var(--faint);width:18px}
+.cp-nob-legend{display:flex;justify-content:space-between;max-width:520px;font-size:12px;color:var(--muted)}
+.cp-tags{display:flex;flex-wrap:wrap;gap:6px}
+.cp-steps{display:flex;flex-direction:column;gap:8px}
+.cp-step{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:14px;background:var(--glass);border:1px solid var(--glass-b);font-size:14px;line-height:1.45}
+.cp-step>.num{flex:none;width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:flex;align-items:center;justify-content:center;font-weight:700}
+.cp-step>div{display:flex;flex-direction:column;gap:2px}.cp-step b{font-family:var(--f-display)}
+.cp-termos{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+.cp-termo{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:12px;background:var(--glass);border:1px solid var(--glass-b);font-size:13.5px}
+.cp-formula{font-family:var(--f-mono);font-size:14px;padding:10px 14px;border-radius:12px;background:rgba(0,0,0,.25);border:1px solid var(--glass-b);color:var(--accent-ink)}
+.cp-bigs{display:flex;flex-wrap:wrap;gap:10px}
+.cp-big{display:flex;flex-direction:column;gap:2px;padding:12px 16px;border-radius:14px;background:rgba(0,0,0,.22);border:1px solid var(--glass-b);min-width:150px}
+.cp-big small{font-size:12px;color:var(--muted);font-weight:600}.cp-big b{font-size:24px;color:var(--accent-ink)}.cp-big span{font-size:12px;color:var(--muted)}
+.cp-tbl{display:flex;flex-direction:column;border:1px solid var(--glass-b);border-radius:12px;overflow:hidden;font-size:13.5px}
+.cp-tr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:8px 12px;border-top:1px solid var(--line)}
+.cp-tr.h{border-top:0;background:rgba(0,0,0,.25);font-weight:700;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+.cp-ce{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.cp-ce-i{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:14px;background:var(--glass);border:1px solid var(--glass-b)}
+.cp-ce-i .cp-fig figcaption{display:none}.cp-ce-i .cp-img img{height:150px}.cp-ce-i small{color:var(--muted);font-size:13px}
+.cp-ce-r{display:flex;gap:8px;align-items:flex-start;font-size:14px;line-height:1.45}.cp-ce-r svg{width:18px;height:18px;flex:none;margin-top:2px}
+.cp-ce-r.bad svg{color:var(--bad)}.cp-ce-r.good svg{color:var(--good)}
+.cp-q{font-family:var(--f-display);font-size:18px;line-height:1.3}
+.cp-op{text-align:left;padding:12px 14px;border-radius:12px;border:1px solid var(--glass-b);background:var(--glass);color:var(--ink);font-size:14.5px}
+.cp-op.ok{border-color:var(--good);background:rgba(61,220,151,.12)}.cp-op.no{border-color:var(--bad);background:rgba(240,106,92,.12)}
+.cp-apo{align-self:flex-start}
+.cp-link{flex-direction:row;align-items:center;min-height:0;gap:14px}.cp-link>div:last-child{display:flex;flex-direction:column;gap:4px}
+@media (max-width:720px){.cp-split,.cp-pilha{grid-template-columns:1fr}.cp-graus{grid-template-columns:repeat(2,minmax(0,1fr))}.cp-tri{grid-template-columns:1fr}.cp-limp-i{grid-template-columns:110px minmax(0,1fr)}.cp-limp-i .cp-img img{height:90px}}
+@media (max-width:480px){.cp-duo{grid-template-columns:1fr}.cp-sec .fields3{grid-template-columns:1fr 1fr}}
 /* Ordem de precedência */
 .pr-abas{max-width:620px}
 .pr-abas button{padding:10px 11px}
@@ -1062,7 +1123,7 @@ function gIndex(){
   E.push({tipo:"Ferramentas", t:"Calculadora de tinta", sub:"Baldes por compartimento e mistura com o componente", txt:"calculadora tinta balde pintura compartimento demão rendimento m2 mistura componente catalisador kit proporção epóxi", act:"tool", arg:"tinta"});
   E.push({tipo:"Lazer", t:"Aliado", sub:"Jogo em duplas, com dois dados", txt:"aliado jogo ludo dados dupla tabuleiro lona paiol caveira pitoco sena ás morto peru sangrando lazer passatempo fluminense flamengo vasco botafogo", act:"appOpen", arg:"aliado"});
   E.push({tipo:"Marinharia", t:"Que peça é essa?", sub:"Jogo de nomes de equipamentos", txt:"jogo quiz treinar nomes equipamento peça figura moitão catarina patesca charneira cadernal trolley talha teque manilha gato sapatilho tornel ferro âncora poleame marinheiro cabo cabo de esquadra sargento mestre", act:"marOpen", arg:"jogo"});
-  E.push({tipo:"Marinharia", t:"Apostilas", sub:"Arte Naval, Mestrança, Fainas Marinheiras Especiais, Manobras de Peso, ENGENALMARINST 60-01D", txt:"apostila apostilas arte naval mestrança fainas marinheiras especiais manobras de peso ciaa c-ap mr livro pdf ler pesquisar engenalmarinst 60-01d publicação pintura", act:"marOpen", arg:"apostilas"});
+  E.push({tipo:"Marinharia", t:"Apostilas", sub:"Arte Naval, Mestrança, Fainas, Manobras de Peso, ENGENALMARINST 60-01D, Corrosão e Pintura", txt:"curso expedito cpp corrosão pintura proteção catódica etam apostila apostilas arte naval mestrança fainas marinheiras especiais manobras de peso ciaa c-ap mr livro pdf ler pesquisar engenalmarinst 60-01d publicação pintura", act:"marOpen", arg:"apostilas"});
   E.push({tipo:"Marinharia", t:"Tintas e pintura", sub:"Tintas do paiol pela cor, tipos, compatibilidade, mistura", txt:"tinta tintas paiol cor cores pintura pintar alquídica alquidica esmalte sintético epóxi epoxi poliuretano pu catalisador componente endurecedor agente de cura isocianato neb numeração proporção mistura pot life vida útil diluente thinner solvente pigmento resina verniz primer fundo acabamento enrugar bolha estourar descascar calcinação compatibilidade teste do solvente", act:"marOpen", arg:"tintas"});
   ((S.content.tintas && S.content.tintas.data.itens) || []).forEach(t => E.push({tipo:"Tintas", t:(t.num ? t.num + " · " : "") + (t.nome || "Tinta"), sub:[TIPOS_TINTA[t.tipo] ? TIPOS_TINTA[t.tipo].n : "", t.uso].filter(Boolean).join(" · "), txt:[t.num, t.nome, t.comp, t.compNome, t.cor, tnFam(t), t.grupo, t.uso, t.local, t.obs].join(" "), act:"tnAbrir", arg:t.num || t.nome || ""}));
   E.push({tipo:"Marinharia", t:"Esquemas de pintura", sub:"Ordem das tintas por local (ENGENALMARINST 60-01D)", txt:"esquema esquemas de pintura engenalmarinst 60-01d ordem das tintas demão demãos primer acabamento costado superestrutura linha d'água obras vivas convoo convés de voo convés escada plataforma de pouso tanque aguada paiol amarras ferro munição console painel indicativo calado", act:"marOpen", arg:"esquemas"});
@@ -1072,6 +1133,7 @@ function gIndex(){
   E.push({tipo:"Qualidade de vida", t:"Calculadora financeira", sub:"Simulador, graduações, carreira, investir", txt:"calculadora financeira remuneração salário soldo líquido bruto imposto renda pensão fusma graduação carreira investir patrimônio quanto deveria ter", act:"vidaFin", arg:""});
   E.push({tipo:"Qualidade de vida", t:"Educação financeira", sub:"Contracheque, dívidas, investimentos, casa, subsídios e carro", txt:"educação financeira finanças dinheiro orçamento 50 30 20 reserva de emergência dívida cartão rotativo consignado juros compostos investimento renda fixa variável liquidez risco fgc imposto casa própria financiamento sac price minha casa minha vida subsídio pnr auxílio carro viável graduação seguro ipva", act:"mod", arg:"edufin"});
   if (window.PRECEDENCIA_INDEX) E.push(...PRECEDENCIA_INDEX());
+  if (window.PINTURA_INDEX) E.push(...PINTURA_INDEX());
   APPS.forEach(a => E.push({tipo:"Apps", t:a.nome, sub:a.tag, txt:[a.nome, a.tag, a.resumo, ...a.telas.map(x => x.t)].join(" "), act:"tab", arg:"apps"}));
   return E;
 }
@@ -1512,6 +1574,7 @@ function viewMar(){
   if (S.mar === "jogo") return viewJogo();
   if (S.mar === "precedencia" && window.viewPrecedencia) return viewPrecedencia();
   if (S.mar === "tintas") return viewTintas();
+  if (S.mar === "pintura" && window.viewPintura) return viewPintura();
   if (S.mar === "esquemas") return viewEsquemas();
   if (S.mar === "apostilas") return viewApostilas();
   if (S.mar === "apo" && S.apo) return viewLeitor();
@@ -1520,7 +1583,8 @@ function viewMar(){
 }
 const marTiles = () => `<button class="tile" data-act="prAbrir" data-arg="postos"><div class="tile-i">${ic("whistle")}</div><b>Ordem de precedência</b><div class="sub">Postos do mais antigo ao mais moderno, o toque de apito de cada um, quantos boys e as autoridades civis.</div></button>
   <button class="tile" data-act="marOpen" data-arg="jogo"><div class="tile-i">${ic("game")}</div><b>Que peça é essa?</b><div class="sub">Jogo: veja a figura e diga o nome. Níveis de Marinheiro a Mestre.</div></button>
-  <button class="tile" data-act="marOpen" data-arg="apostilas"><div class="tile-i">${ic("book")}</div><b>Apostilas</b><div class="sub">Arte Naval, Mestrança, Fainas Marinheiras Especiais, Manobras de Peso e ENGENALMARINST 60-01D, com pesquisa.</div></button>
+  <button class="tile" data-act="marOpen" data-arg="apostilas"><div class="tile-i">${ic("book")}</div><b>Apostilas</b><div class="sub">Arte Naval, Mestrança, Fainas Marinheiras Especiais, Manobras de Peso, ENGENALMARINST 60-01D e o curso de Corrosão e Pintura, com pesquisa.</div></button>
+  <button class="tile" data-act="cpAbrir" data-arg="corrosao"><div class="tile-i">${ic("drop")}</div><b>Corrosão e pintura</b><div class="sub">O curso de pintura industrial: por que o aço enferruja, preparo da chapa, como pintar certo, proteção catódica, contas e teste.</div></button>
   <button class="tile" data-act="marOpen" data-arg="tintas"><div class="tile-i">${ic("roller")}</div><b>Tintas e pintura</b><div class="sub">Tintas do paiol pela cor (tipo e para que serve), alquídica, epóxi e PU, o que pode ir sobre o quê e como acertar a mistura.</div></button>
   <button class="tile" data-act="marOpen" data-arg="esquemas"><div class="tile-i">${ic("layers")}</div><b>Esquemas de pintura</b><div class="sub">Costado, convoo, convés, tanques, paióis: o preparo e a ordem das tintas, pela ENGENALMARINST 60-01D.</div></button>
   <button class="tile" data-act="marOpen" data-arg="cintas"><div class="tile-i">${ic("sling")}</div><b>Cintas de elevação</b><div class="sub">Código de cores, etiqueta, fator de segurança, modos de amarração e quando retirar de uso.</div></button>
@@ -1530,7 +1594,15 @@ const marTiles = () => `<button class="tile" data-act="prAbrir" data-arg="postos
    As apostilas do CIAA proíbem reprodução e o repositório é público. Por isso os arquivos em apostilas/ ficam cifrados (AES-GCM):
    a chave e a lista de arquivos vêm do Supabase (alm_content "apostilas", audience todos), só para quem tem acesso liberado.
    Os arquivos baixados ficam no cache "alm-apostilas" do aparelho, para abrir sem internet. */
-const APO = () => (S.content.apostilas && S.content.apostilas.data) || null;
+/* Apostilas novas que ainda não estão na lista do banco: entram pelo código, cifradas com a MESMA chave do banco.
+   Se a lista do banco já tiver o mesmo id, vale a do banco. */
+const APO_EXTRA = [{"id": "corrosao-pintura", "titulo": "Corrosão, Pintura e Proteção Catódica", "sub": "Curso Expedito CPP · apostila e slides", "paginas": 178, "bytes": 4422635, "caps": [{"n": "1", "t": "Corrosão", "p": 3}, {"n": "2", "t": "Tratamento de superfície", "p": 21}, {"n": "3", "t": "Pintura industrial", "p": 31}, {"n": "4", "t": "Proteção catódica", "p": 46}, {"n": "S1", "t": "Slides · Parte 1: Corrosão", "p": 56}, {"n": "S2", "t": "Slides · Parte 2: Tratamento de superfície", "p": 115}, {"n": "S3", "t": "Slides · Parte 3: Pintura industrial", "p": 151}, {"n": "S4", "t": "Slides · Parte 4: Proteção catódica", "p": 164}], "pdf": "a-corrosao-pintura.8c0b139c7b.bin", "txt": "t-corrosao-pintura.d67f69dfe2.bin"}];
+let APO_M = {src:null, v:null};
+const APO = () => {
+  const d = S.content.apostilas && S.content.apostilas.data; if (!d) return null;
+  if (APO_M.src !== d) { const ids = new Set((d.apostilas || []).map(a => a.id)); APO_M = {src:d, v:Object.assign({}, d, {apostilas:[...(d.apostilas || []), ...APO_EXTRA.filter(a => !ids.has(a.id))]})}; }
+  return APO_M.v;
+};
 const APOC = "alm-apostilas";
 const AM = {key:null, txt:{}, ntxt:{}, docs:{}, jogo:null, lib:null, off:{}};
 const apoUrl = f => new URL("apostilas/" + f, location.href).href;
@@ -1694,7 +1766,7 @@ const jImg = q => `<span class="j-wrap"><img src="${AM.jogo.imgs[q.img]}" alt="F
 let APQ = {q:"", t:null, hits:null, busy:false, msg:""};
 function viewApostilas(){
   const A = APO();
-  const head = `<button class="back" data-act="marBack">${ic("left")}Marinharia</button><div class="page-h"><span class="eyebrow">Marinharia · Biblioteca</span><h1>Apostilas</h1><p class="sub" style="font-size:15px">Arte Naval, as apostilas do CIAA (sem a capa) e publicações como a ENGENALMARINST 60-01D. Pesquise uma palavra em todas de uma vez ou abra uma para ler.</p></div>`;
+  const head = `<button class="back" data-act="marBack">${ic("left")}Marinharia</button><div class="page-h"><span class="eyebrow">Marinharia · Biblioteca</span><h1>Apostilas</h1><p class="sub" style="font-size:15px">Arte Naval, as apostilas do CIAA (sem a capa), publicações como a ENGENALMARINST 60-01D e o curso de Corrosão, Pintura e Proteção Catódica. Pesquise uma palavra em todas de uma vez ou abra uma para ler.</p></div>`;
   if (!A) return head + `<div class="note">${ic("info")}<span>As apostilas ainda não chegaram a este aparelho. Abra o app com internet uma vez.</span></div>`;
   setTimeout(apoMarkOffline, 0); if (!AM.pruned) { AM.pruned = true; apoPrune(); }
   return head + `<div class="search">${ic("search")}<input id="apo-q" class="input" type="search" placeholder="Pesquisar nas apostilas (ex.: patesca, amarra, nó de escota)" autocomplete="off" value="${esc(APQ.q)}" aria-label="Pesquisar nas apostilas"></div>
@@ -1918,6 +1990,7 @@ function viewTintas(){
   return `<button class="back" data-act="marBack">${ic("left")}Marinharia</button>
     <div class="page-h"><span class="eyebrow">Marinharia · Pintura</span><h1>Tintas e pintura</h1><p class="sub" style="font-size:15px">A tinta certa, com o componente certo, no lugar certo. Encontre a tinta pela numeração, veja o que pode ir sobre o quê e acerte a mistura.</p></div>
     ${tnLocalizador()}
+    <button type="button" class="tile cp-link" data-act="cpAbrir" data-arg="corrosao"><div class="tile-i">${ic("drop")}</div><div><b>Corrosão e pintura: o curso</b><div class="sub">Preparo da chapa (St, Sa, WJ), rugosidade, ponto de orvalho, aplicação, proteção catódica e o certo × errado.</div></div></button>
     <nav class="hmenu" aria-label="Partes do guia">${secs.map(([id, n]) => `<button data-act="jump" data-arg="tn-${id}">${n}</button>`).join("")}</nav>
     ${tnComp()}${tnTipos()}${tnSobre()}${tnDefeitos()}${tnMistura()}${tnSeg()}
     <p class="sub" style="font-size:12.5px">Regras gerais de pintura naval. Para cada tinta valem a ficha técnica do fabricante (proporção, vida útil da mistura, intervalo de repintura, diluente) e o esquema de pintura do navio.</p>`;
@@ -3100,5 +3173,6 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") navigator.ser
 </script>
 <script src="aliado.js"></script>
 <script src="precedencia.js"></script>
+<script src="pintura.js"></script>
 </body>
 </html>

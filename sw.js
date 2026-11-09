@@ -1,8 +1,8 @@
 /* Almanaque: guarda o app no aparelho para abrir sem internet. O conteúdo protegido não passa por aqui (vem do Supabase e fica no aparelho só depois do login).
    As apostilas cifradas (apostilas/*.bin) são guardadas pela própria página no cache "alm-apostilas", que não é apagado a cada versão. */
-const CACHE = "alm-v46";
+const CACHE = "alm-v47";
 const KEEP = ["alm-apostilas"];
-const SHELL = ["./", "index.html", "aliado.js", "precedencia.js", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png", "icons/apple-touch-icon.png", "icons/favicon.png", "vendor/supabase.js", "vendor/jspdf.umd.min.js", "vendor/jspdf.plugin.autotable.min.js"];
+const SHELL = ["./", "index.html", "aliado.js", "precedencia.js", "pintura.js", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png", "icons/apple-touch-icon.png", "icons/favicon.png", "vendor/supabase.js", "vendor/jspdf.umd.min.js", "vendor/jspdf.plugin.autotable.min.js"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
 self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE && !KEEP.includes(k)).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener("fetch", e => {
