@@ -251,6 +251,19 @@ select.input{appearance:none;background-image:linear-gradient(45deg,transparent 
 @media (min-width:821px){.selbar{bottom:16px}}
 .ring{width:42px;height:42px;flex:none}
 
+/* croquis dos locais */
+.croquis{display:flex;flex-direction:column;gap:12px;margin:0 0 16px}
+.croqui{margin:0;padding:12px;border-radius:16px;background:var(--glass);border:1px solid var(--glass-b)}
+.croqui b{display:block;font-size:14.5px;margin-bottom:8px}
+.croqui button{display:block;width:100%;padding:0;border:0;background:none;cursor:zoom-in}
+.croqui img{display:block;max-width:100%;width:100%;height:auto;border-radius:12px;background:#fff}
+.cq-view{position:fixed;inset:0;z-index:90;background:rgba(2,6,10,.94);display:flex;flex-direction:column}
+.cq-bar{display:flex;align-items:center;gap:10px;padding:12px 16px;padding-top:calc(12px + env(safe-area-inset-top,0px));color:#fff}
+.cq-bar b{flex:1;min-width:0;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cq-scroll{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y pinch-zoom;padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px))}
+.cq-scroll img{display:block;margin:auto;max-width:100%;height:auto;background:#fff;border-radius:8px;cursor:zoom-in}
+.cq-scroll.z img{max-width:none;width:250%;cursor:zoom-out}
+
 /* modal */
 .scrim{position:fixed;inset:0;z-index:60;background:rgba(2,8,14,.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:16px}
 .sheet{width:min(560px,100%);max-height:calc(100vh - 32px);overflow:auto;background:linear-gradient(180deg,#132A40,#0D1F31);border:1px solid var(--glass-b);border-radius:22px;padding:20px;box-shadow:0 30px 80px rgba(0,0,0,.5)}
@@ -1354,6 +1367,7 @@ function viewLocal(l){
   const s = incStats(l);
   return `<button class="back" data-act="localBack">${ic("left")}Incumbências</button>
     <div class="page-h"><span class="eyebrow">Local</span><h1>${esc(l.nome)}</h1>${l.descricao ? `<p class="sub" style="font-size:15px">${esc(l.descricao)}</p>` : ""}<p class="sub">${l.itens.length} itens · ${s.pct}% das medidas preenchidas</p></div>
+    ${croquisHtml(l)}
     ${(l.checklists || []).map(c => `<details class="sec" data-chk="${esc(c.id)}" ${OPEN_CHK.includes(c.id) ? "open" : ""}><summary><span class="sec-n">${ic("check").replace('<svg','<svg width="16" height="16"')}</span><b>${esc(c.titulo)}</b><span class="pill">${stepsDone(c.id).length}/${c.itens.length}</span>${ic("down")}</summary><div class="sec-body">${blk({tipo:"passos", id:c.id, itens:c.itens})}</div></details>`).join("")}
     ${S.sel ? `<div class="note">${ic("folder")}<span>Toque nos itens que quer juntar e depois em <b>Mover para pasta</b>.</span></div>`
       : !canInc() ? `<div class="row"><button class="btn sm" data-act="pdf" data-arg="${esc(l.id)}">${ic("pdf")}Gerar PDF</button></div>`
@@ -1364,6 +1378,22 @@ function viewLocal(l){
     <div class="items">${l.itens.filter(it => !it.pasta).map(it => itemRow(l, it)).join("") || (l.itens.length ? "" : `<div class="empty">Nenhum item.</div>`)}</div>
     ${S.sel ? `<div class="selbar"><span><b class="num">${S.sel.length}</b> ${S.sel.length === 1 ? "item" : "itens"}</span><button class="btn sm ghost" data-act="organizeEnd">Cancelar</button><button class="btn sm primary" data-act="moveOpen" ${S.sel.length ? "" : "disabled"}>${ic("folder")}Mover para pasta</button></div>` : ""}`;
 }
+/* Croquis do local: campo opcional l.croquis = [{id, titulo, img}] com img em data URL. Só exibe; o editor do local preserva o campo. */
+const croquisOk = l => (Array.isArray(l.croquis) ? l.croquis : []).filter(c => c && typeof c.img === "string" && c.img.startsWith("data:image/"));
+function croquisHtml(l){
+  const cs = croquisOk(l); if (!cs.length) return "";
+  return `<div class="croquis">${cs.map((c, i) => `<figure class="croqui">${c.titulo ? `<b>${esc(c.titulo)}</b>` : ""}<button type="button" data-act="croqui" data-arg="${esc(l.id)}" data-i="${i}" aria-label="Ampliar ${esc(c.titulo || "croqui")}"><img src="${esc(c.img)}" alt="${esc(c.titulo || "Croqui")}" loading="lazy"></button></figure>`).join("")}</div>`;
+}
+function croquiView(lid, i){
+  const l = (inc() && inc().locais || []).find(x => x.id === lid), c = l && croquisOk(l)[+i]; if (!c) return;
+  croquiClose();
+  const d = document.createElement("div"); d.className = "cq-view"; d.id = "cq-view"; d.setAttribute("role", "dialog"); d.setAttribute("aria-modal", "true");
+  d.innerHTML = `<div class="cq-bar"><b>${esc(c.titulo || "Croqui")}</b><button type="button" class="btn sm" data-act="croquiClose">${ic("x")}Fechar</button></div><div class="cq-scroll"><img src="${esc(c.img)}" alt="${esc(c.titulo || "Croqui")}"></div>`;
+  const sc = d.querySelector(".cq-scroll");
+  sc.querySelector("img").addEventListener("click", ev => { ev.stopPropagation(); sc.classList.toggle("z"); });
+  document.body.appendChild(d); document.body.style.overflow = "hidden";
+}
+function croquiClose(){ const d = document.getElementById("cq-view"); if (d) { d.remove(); document.body.style.overflow = ""; } return !!d; }
 /* Pastas: cada item guarda o nome da pasta em "pasta"; a ordem segue a primeira aparição. */
 const pastasDe = l => [...new Set(l.itens.map(it => it.pasta).filter(Boolean))];
 let OPEN_PASTA = [];
@@ -3085,6 +3115,8 @@ const ACT = {
   finReset(){ if (!confirm("Voltar todos os valores aos da planilha de 2026?")) return; S.content.financeiro = {key:"financeiro", audience:"todos", data:clone(FIN_PADRAO)}; putContent("financeiro"); closeModal(); render(); toast("Valores da planilha restaurados"); },
   mod(a){ if (a === "publicacoes") return ACT.marOpen("apostilas"); S.tab = "bemvindo"; S.mod = a; render(); scrollTo(0, 0); },
   modBack(){ S.mod = null; render(); },
+  croqui(a, el){ croquiView(a, el.dataset.i); },
+  croquiClose(){ croquiClose(); },
   local(a){ S.gq = ""; S.tab = "incumbencias"; S.local = a; render(); scrollTo(0, 0); },
   localBack(){ S.local = null; S.sel = null; render(); },
   organize(){ if (!canInc()) return; S.sel = []; render(); },
@@ -3153,7 +3185,7 @@ document.addEventListener("click", ev => {
   const fn = ACT[el.dataset.act]; if (fn) { ev.preventDefault(); fn(el.dataset.arg, el); }
 });
 document.addEventListener("keydown", ev => {
-  if (ev.key === "Escape") closeModal();
+  if (ev.key === "Escape") { if (croquiClose()) return; closeModal(); }
   if (ev.key === "Enter" && ev.target.id === "f-newcol") { ev.preventDefault(); ACT.fieldAdd(); }
 });
 document.addEventListener("input", ev => {
