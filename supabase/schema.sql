@@ -92,3 +92,13 @@ create policy "alm mestre altera incumbências" on public.alm_content for update
 
 -- Uso geral também VÊ as incumbências (só leitura; editar continua só mestre e encarregado).
 alter policy "alm ler conteúdo" on public.alm_content using ((audience = 'todos' and public.alm_is_member()) or public.alm_is_admin() or (key = 'incumbencias' and public.alm_is_member()));
+-- Visitante (24/11/2026): só leitura e SEM incumbências; o banco não entrega a chave incumbencias para ele.
+alter table public.alm_members add column if not exists visitante boolean not null default false;
+create or replace function public.alm_is_visitante() returns boolean language sql stable security definer set search_path = '' as $$
+  select exists (select 1 from public.alm_members where user_id = (select auth.uid()) and approved and visitante);
+$$;
+revoke all on function public.alm_is_visitante() from public, anon;
+grant execute on function public.alm_is_visitante() to authenticated;
+alter policy "alm ler conteúdo" on public.alm_content
+  using ((audience = 'todos' and public.alm_is_member()) or public.alm_is_admin()
+         or (key = 'incumbencias' and public.alm_is_member() and not public.alm_is_visitante()));
